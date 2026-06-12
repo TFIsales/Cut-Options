@@ -42,6 +42,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 .legend{display:flex;gap:16px;font-size:11px;color:var(--muted);flex-wrap:wrap;align-items:center;width:100%;padding-top:4px;border-top:1px dashed var(--line2);margin-top:2px}
 .legend b{color:var(--navy)}
 .curchip{font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--navy);background:#fff;border:1px solid var(--navy-soft);border-radius:20px;padding:6px 12px;white-space:nowrap}
+.currswitch{display:flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden;flex-shrink:0}
+.currbtn{background:#fff;color:var(--muted);border:none;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:.12s;letter-spacing:.3px}
+.currbtn:hover{background:var(--panel);color:var(--navy)}
+.currbtn.active[data-curr="AUD"]{background:var(--navy);color:#fff}
+.currbtn.active[data-curr="USD"]{background:#1a5c2e;color:#fff}
+.fxrow{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--navy);white-space:nowrap;background:#f0faf4;border:1.5px solid var(--green-line);border-radius:8px;padding:6px 12px}
+.fxrow input{width:78px;font-size:13px;font-weight:700;text-align:center}
 
 /* tabs */
 .tabs{display:flex;flex-wrap:wrap;gap:6px;background:var(--bg);padding:16px 22px;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
@@ -256,7 +263,15 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
 </div>
 <div class="controls">
   <div class="carc"><span>Carcase weight</span> <input class="n" type="number" id="carcase" step="1"> <span style="font-weight:600;color:var(--green)">kg</span></div>
-  <span class="curchip">All prices AUD &middot; FOB</span>
+  <div class="currswitch">
+    <button class="currbtn active" data-curr="AUD">AUD</button>
+    <button class="currbtn" data-curr="USD">USD</button>
+  </div>
+  <div class="fxrow" id="fxRow" style="display:none">
+    <span>1 AUD&nbsp;=</span>
+    <input class="n" type="number" id="fxRateInp" step="0.0001" placeholder="0.6400">
+    <span>USD</span>
+  </div>
   <div class="sep"></div>
   <button class="btn" id="exportBtn">Export</button>
   <button class="btn ghost" id="importBtn">Import</button>
@@ -267,15 +282,15 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
     <span><b>1st option = reference</b> (not boned)</span>
     <span><b style="color:#2e8b46">&#9650; green</b> boning pays</span>
     <span><b style="color:#c0392b">&#9660; red</b> leave whole</span>
-    <span><b style="color:#2e8b46">&#9678;</b> solve break-even $/kg</span>
-    <span>All $ values are <b>AUD, FOB</b></span>
+    <span><b style="color:#2e8b46">&#9678;</b> solve break-even $/kg AUD</span>
+    <span>$/kg inputs are always <b>AUD FOB</b></span>
   </div>
 </div>
 <div class="tabs" id="tabs"></div>
 <div class="wrap" id="wrap"></div>
 
 <div class="bottombar">
-  <div class="gt">Selected routes &mdash; total off carcase <b id="grandTotal">$0.00</b> <span style="font-size:12px;color:var(--brand-green)">AUD FOB</span></div>
+  <div class="gt">Selected routes &mdash; total off carcase <b id="grandTotal">A$0.00</b> <span id="currLabel" style="font-size:12px;color:var(--brand-green)">AUD FOB</span></div>
   <div class="perkg" id="perKg"></div>
   <button class="bd" id="bdBtn">Breakdown &#9662;</button>
 </div>
@@ -427,7 +442,7 @@ let uid=1; const nid=()=>'k'+(uid++);
 let state, active;
 
 function buildState(src){
-  const s={carcase:src.carcase||280,order:[],cats:{}};
+  const s={carcase:src.carcase||280,fxRate:src.fxRate||0.64,displayCurrency:src.displayCurrency||'AUD',order:[],cats:{}};
   Object.keys(src.cats).forEach(cat=>{
     s.order.push(cat);
     s.cats[cat]=src.cats[cat].map(blk=>({
@@ -461,18 +476,23 @@ function setCloud(t){const el=document.getElementById('cloudStatus');if(el)el.te
 /* keep the id counter ahead of any ids already present in a loaded document */
 function bumpUid(s){let m=0;JSON.stringify(s).replace(/"k(\d+)"/g,(_,n)=>{m=Math.max(m,+n);return _;});uid=Math.max(uid,m+1);}
 
-/* ----- per-user overlay: prices, labour, route selection, include toggle ----- */
+/* ----- per-user overlay: prices, labour, route selection, include, carcase, fx ----- */
 function extractOverlay(s){
   const rows={};const selections={};
   s.order.forEach(cat=>(s.cats[cat]||[]).forEach(blk=>{
     selections[blk.id]={sel:blk.sel,include:blk.include};
     blk.options.forEach(o=>o.rows.forEach(r=>{rows[r.id]={price:r.price,labour:r.labour};}));
   }));
-  return {rows,selections};
+  return {rows,selections,carcase:s.carcase,fxRate:s.fxRate,displayCurrency:s.displayCurrency};
 }
 function applyOverlay(tmpl,overlay){
   const rv=(overlay&&overlay.rows)||{};
   const sel=(overlay&&overlay.selections)||{};
+  if(overlay){
+    if(overlay.carcase!=null)tmpl.carcase=+overlay.carcase||tmpl.carcase;
+    if(overlay.fxRate!=null)tmpl.fxRate=+overlay.fxRate||tmpl.fxRate;
+    if(overlay.displayCurrency!=null)tmpl.displayCurrency=overlay.displayCurrency;
+  }
   tmpl.order.forEach(cat=>(tmpl.cats[cat]||[]).forEach(blk=>{
     if(sel[blk.id]!=null){
       if(sel[blk.id].sel!=null)blk.sel=sel[blk.id].sel;
@@ -538,6 +558,11 @@ async function loadInitial(){
 const carc=()=>parseFloat(state.carcase)||0;
 function rowVal(blk,r){return blk.mode==='kg'? r.price*r.q : r.price*r.q*carc();}
 function optNet(blk,o){let v=0;o.rows.forEach(r=>{v+=rowVal(blk,r)-(+r.labour||0)});return v;}
+/* currency display helpers — all internal values are AUD; fx converts for display only */
+function fx(aud){return state.displayCurrency==='USD'?aud*(+state.fxRate||0.64):aud;}
+function sym(){return state.displayCurrency==='USD'?'US$':'A$';}
+function fmtMoney(v){const s=sym();const a=fx(v);return(a<0?'-'+s:s)+Math.abs(a).toFixed(2);}
+function fmtDelta(d){const s=sym();const a=fx(d);return(a>=0?'+'+s:'-'+s)+Math.abs(a).toFixed(2);}
 
 /* ---------- render ---------- */
 function render(){
@@ -671,19 +696,20 @@ function recalc(){
     (state.cats[cat]||[]).forEach(blk=>{
       const baseNet=optNet(blk,blk.options[0]);
       blk.options.forEach((o,oi)=>{
-        o.rows.forEach(r=>{const c=document.querySelector(`[data-rowval="${r.id}"]`);if(c)c.textContent='$'+rowVal(blk,r).toFixed(2);});
+        o.rows.forEach(r=>{const c=document.querySelector(`[data-rowval="${r.id}"]`);if(c)c.textContent=fmtMoney(rowVal(blk,r));});
         const net=optNet(blk,o);
-        const nc=document.querySelector(`[data-net="${o.id}"]`);if(nc)nc.textContent='$'+net.toFixed(2);
+        const nc=document.querySelector(`[data-net="${o.id}"]`);if(nc)nc.textContent=fmtMoney(net);
         if(oi>0){const d=net-baseNet;const de=document.querySelector(`[data-delta="${o.id}"]`);
-          if(de){de.className='delta '+(d>=0?'pos':'neg');de.querySelector('.val').textContent=(d>=0?'+$':'-$')+Math.abs(d).toFixed(2);de.querySelector('.verdict').textContent=d>=0?'boning pays':'leave whole';}}
+          if(de){de.className='delta '+(d>=0?'pos':'neg');de.querySelector('.val').textContent=fmtDelta(d);de.querySelector('.verdict').textContent=d>=0?'boning pays':'leave whole';}}
       });
       if(blk.include){const sn=optNet(blk,blk.options[blk.sel]||blk.options[0]);grand+=sn;bd.push([blk.title,(blk.options[blk.sel]||blk.options[0]).name,sn]);}
     });
   });
-  document.getElementById('grandTotal').textContent='$'+grand.toFixed(2);
-  const c=carc();document.getElementById('perKg').textContent=c>0?('= $'+(grand/c).toFixed(2)+' / kg carcase'):'';
+  document.getElementById('grandTotal').textContent=fmtMoney(grand);
+  const c=carc();document.getElementById('perKg').textContent=c>0?('= '+fmtMoney(grand/c)+' / kg carcase'):'';
+  const cl=document.getElementById('currLabel');if(cl)cl.textContent=state.displayCurrency==='USD'?`USD FOB (1 AUD = ${(+state.fxRate||0.64).toFixed(4)} USD)`:'AUD FOB';
   const list=document.getElementById('bdList');
-  list.innerHTML=bd.length?bd.map(x=>`<div class="ln"><span>${esc(x[0])} — <i>${esc(x[1])}</i></span><b>$${x[2].toFixed(2)}</b></div>`).join('')+`<div class="ln" style="border:none;margin-top:6px"><span><b>TOTAL</b></span><b>$${grand.toFixed(2)}</b></div>`:'<div class="ln"><span>No primals included</span></div>';
+  list.innerHTML=bd.length?bd.map(x=>`<div class="ln"><span>${esc(x[0])} — <i>${esc(x[1])}</i></span><b>${fmtMoney(x[2])}</b></div>`).join('')+`<div class="ln" style="border:none;margin-top:6px"><span><b>TOTAL</b></span><b>${fmtMoney(grand)}</b></div>`:'<div class="ln"><span>No primals included</span></div>';
 }
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -692,7 +718,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 const carcInp=document.getElementById('carcase');
 const resetBtn=document.getElementById('resetBtn');
 const importBtn=document.getElementById('importBtn');
-carcInp.oninput=()=>{ if(!isAdmin)return; state.carcase=parseFloat(carcInp.value)||0;save();recalc();};
+carcInp.oninput=()=>{state.carcase=parseFloat(carcInp.value)||0;save();recalc();};
 resetBtn.onclick=()=>{
   if(isAdmin){
     if(confirm('Reset the master options to the original sheet values? This replaces what everyone sees.')){
@@ -713,18 +739,37 @@ document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(
 const bdPanel=document.getElementById('bdPanel');
 document.getElementById('bdBtn').onclick=()=>{bdPanel.style.display=bdPanel.style.display==='block'?'none':'block';};
 
+/* currency toggle + FX rate */
+const fxRow=document.getElementById('fxRow');
+const fxRateInp=document.getElementById('fxRateInp');
+document.querySelectorAll('.currbtn').forEach(btn=>{
+  btn.onclick=()=>{
+    state.displayCurrency=btn.dataset.curr;
+    document.querySelectorAll('.currbtn').forEach(b=>b.classList.toggle('active',b===btn));
+    fxRow.style.display=state.displayCurrency==='USD'?'flex':'none';
+    save();recalc();
+  };
+});
+fxRateInp.oninput=()=>{state.fxRate=parseFloat(fxRateInp.value)||0.64;save();recalc();};
+
+function syncCurrencyUI(){
+  const isUSD=state.displayCurrency==='USD';
+  document.querySelectorAll('.currbtn').forEach(b=>b.classList.toggle('active',b.dataset.curr===state.displayCurrency));
+  fxRow.style.display=isUSD?'flex':'none';
+  fxRateInp.value=state.fxRate||0.64;
+}
+
 /* enable/disable the role-specific toolbar controls */
 function applyRole(){
-  carcInp.readOnly=!isAdmin;
   importBtn.style.display=isAdmin?'':'none';
-  resetBtn.textContent=isAdmin?'Reset to sheet':'Reset my $/kg';
+  resetBtn.textContent=isAdmin?'Reset to sheet':'Reset my prices';
   document.getElementById('roleTag').textContent=isAdmin?'admin':'price entry';
 }
 
 /* ---------- start the app (after auth) ---------- */
 async function startApp(){
-  state=await loadInitial();active=state.order[0];carcInp.value=state.carcase;render();
-  // make sure a master template exists in the cloud for everyone else to read
+  state=await loadInitial();active=state.order[0];carcInp.value=state.carcase;
+  syncCurrencyUI();render();
   if(isAdmin&&sb&&currentUser)save();
 }
 
