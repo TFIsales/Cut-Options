@@ -29,5 +29,5 @@ window.CUT_OPTIONS_CONFIG = {
 
   // Set to false to hide the "Create account" tab and make the site
   // invite/login-only (you then create users from the Supabase dashboard).
-  ALLOW_SIGNUP: true
+  ALLOW_SIGNUP: false
 };
