@@ -41,15 +41,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 .legend b{color:var(--navy)}
 
 /* tabs */
-.tabs{display:flex;flex-wrap:wrap;gap:4px;background:var(--bg);padding:12px 18px 0;align-items:center}
-.tab{background:var(--card);color:var(--muted);border:1px solid var(--line);border-bottom:none;padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600;border-radius:9px 9px 0 0;display:flex;align-items:center;gap:7px;position:relative;top:1px}
-.tab:hover{color:var(--navy)}
-.tab.active{color:var(--navy);box-shadow:inset 0 -3px 0 var(--brand-green)}
-.tab .x{opacity:0;font-size:11px;color:var(--muted);transition:opacity .15s}
-.tab:hover .x{opacity:.6}
-.tab .x:hover{opacity:1;color:var(--red)}
-.addcat{color:var(--green);background:transparent;border:none;cursor:pointer;font-weight:700;font-size:13px;padding:8px 10px}
-.addcat:hover{color:var(--navy)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;background:var(--bg);padding:16px 22px;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
+.tab{background:var(--card);color:var(--muted);border:1px solid var(--line);padding:8px 20px;cursor:pointer;font-size:12.5px;font-weight:700;border-radius:30px;display:flex;align-items:center;gap:6px;letter-spacing:.3px;transition:background .15s,color .15s,border-color .15s,box-shadow .15s}
+.tab:hover{color:var(--navy);border-color:var(--navy-soft);background:var(--panel)}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 2px 8px rgba(13,43,78,.18)}
+.tab .x{opacity:0;font-size:10px;color:rgba(255,255,255,.7);transition:opacity .15s}
+.tab:hover .x{opacity:.5}
+.tab.active .x{opacity:.4}
+.tab.active .x:hover{opacity:1;color:#fff}
+.tab:not(.active) .x{color:var(--muted)}
+.tab:not(.active) .x:hover{opacity:1;color:var(--red)}
+.addcat{color:var(--green);background:transparent;border:1px dashed var(--green-line);border-radius:30px;cursor:pointer;font-weight:700;font-size:12.5px;padding:8px 16px;transition:.15s}
+.addcat:hover{background:var(--green-soft);border-color:var(--green);color:var(--navy)}
 
 .wrap{padding:18px 18px 20px;max-width:1120px;margin:0 auto}
 .addprimal{display:block;width:100%;border:1px solid var(--green-line);background:var(--green-soft);color:var(--green);font-weight:700;border-radius:10px;padding:12px;cursor:pointer;font-size:14px;margin-bottom:18px;transition:background .15s}
@@ -138,6 +141,7 @@ input.n:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px var(--
   .topbar .ti{border-left:none;padding-left:0}
   .topbar h1{font-size:15px}
   .controls,.tabs,.wrap{padding-left:14px;padding-right:14px}
+  .tabs{padding:12px 14px;gap:5px}
   thead{display:none}
   tbody td{display:flex;justify-content:space-between;align-items:center;border:none;padding:4px 14px}
   tbody td::before{content:attr(data-l);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.3px;margin-right:10px}
