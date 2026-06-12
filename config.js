@@ -10,8 +10,8 @@
    See README.md for the database + auth setup (one SQL snippet).
    ============================================================ */
 window.CUT_OPTIONS_CONFIG = {
-  SUPABASE_URL: '',   // e.g. 'https://abcdwxyz.supabase.co'
-  SUPABASE_KEY: '',   // anon public key, e.g. 'eyJhbGciOi...'  (or 'sb_publishable_...')
+  SUPABASE_URL: '',   // https://gyzfiulqhvxbttteenad.supabase.co
+  SUPABASE_KEY: '',   // sb_publishable_X0rIIYMIhdbFkzBNuYPyfA_87w0Mi-e
 
   // Usernames are turned into a synthetic email of the form
   //   <username>@<USERNAME_EMAIL_DOMAIN>
