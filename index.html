@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cut Options — Equivalent Value</title>
+<style>
+:root{
+  --navy:#0d2b4e; --navy2:#163c66; --navy-soft:#3a6196;
+  --brand-green:#80c342; --green:#2e8b46; --green-soft:#eef6e6; --green-line:#bfe29a;
+  --red:#c0392b; --red-soft:#fbe9e7;
+  --bg:#eef2f7; --card:#ffffff; --panel:#f4f7fb; --panel2:#eef3f9;
+  --line:#e1e8f1; --line2:#edf1f7; --ink:#1d2b3a; --muted:#6a7990;
+  --shadow:0 1px 3px rgba(13,43,78,.06),0 1px 1px rgba(13,43,78,.04);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;padding-bottom:80px;-webkit-text-size-adjust:100%}
+
+/* header */
+.topbar{background:var(--card);border-bottom:3px solid var(--brand-green);padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.topbar img{height:38px;width:auto;display:block}
+.topbar .ti{border-left:1px solid var(--line);padding-left:18px}
+.topbar h1{margin:0;font-size:16px;font-weight:700;color:var(--navy);letter-spacing:.2px}
+.topbar p{margin:2px 0 0;font-size:12px;color:var(--muted);max-width:560px}
+.topbar .who{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+.topbar .who b{color:var(--navy)}
+.topbar .who button{background:#fff;color:var(--navy);border:1px solid var(--line);border-radius:7px;padding:6px 12px;font-weight:600;cursor:pointer;font-size:12px}
+.topbar .who button:hover{background:var(--panel);border-color:var(--navy-soft)}
+
+/* toolbar */
+.controls{background:var(--card);border-bottom:1px solid var(--line);padding:10px 22px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.controls .carc{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--navy);font-size:13px}
+.controls .carc input{width:80px}
+.controls .sep{flex:1 1 12px}
+.btn{background:var(--navy);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-weight:600;cursor:pointer;font-size:12.5px;transition:background .15s}
+.btn:hover{background:var(--navy2)}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--panel);border-color:var(--navy-soft)}
+.legend{display:flex;gap:16px;font-size:11px;color:var(--muted);flex-wrap:wrap;align-items:center;width:100%;padding-top:4px;border-top:1px dashed var(--line2);margin-top:2px}
+.legend b{color:var(--navy)}
+
+/* tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:4px;background:var(--bg);padding:12px 18px 0;align-items:center}
+.tab{background:var(--card);color:var(--muted);border:1px solid var(--line);border-bottom:none;padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600;border-radius:9px 9px 0 0;display:flex;align-items:center;gap:7px;position:relative;top:1px}
+.tab:hover{color:var(--navy)}
+.tab.active{color:var(--navy);box-shadow:inset 0 -3px 0 var(--brand-green)}
+.tab .x{opacity:0;font-size:11px;color:var(--muted);transition:opacity .15s}
+.tab:hover .x{opacity:.6}
+.tab .x:hover{opacity:1;color:var(--red)}
+.addcat{color:var(--green);background:transparent;border:none;cursor:pointer;font-weight:700;font-size:13px;padding:8px 10px}
+.addcat:hover{color:var(--navy)}
+
+.wrap{padding:18px 18px 20px;max-width:1120px;margin:0 auto}
+.addprimal{display:block;width:100%;border:1px solid var(--green-line);background:var(--green-soft);color:var(--green);font-weight:700;border-radius:10px;padding:12px;cursor:pointer;font-size:14px;margin-bottom:18px;transition:background .15s}
+.addprimal:hover{background:#e4f0d6}
+
+/* card */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow)}
+.card-head{background:var(--panel);border-bottom:1px solid var(--line);padding:11px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.card-head .title{flex:1 1 240px;min-width:180px;background:transparent;border:none;color:var(--navy);font-size:15.5px;font-weight:700;padding:5px 6px;border-radius:6px}
+.card-head .title:hover{background:#fff}
+.card-head .title:focus{outline:none;background:#fff;box-shadow:0 0 0 2px var(--green-soft)}
+.card-head .inc{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.card-head .inc input{accent-color:var(--green)}
+.card-head .del{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:6px;cursor:pointer;padding:4px 9px;font-size:11px;font-weight:600}
+.card-head .del:hover{background:var(--red);border-color:var(--red);color:#fff}
+.note{display:block;width:100%;border:none;border-bottom:1px solid var(--line);background:#fbfcfe;color:var(--muted);font-size:11.5px;padding:7px 14px;font-family:inherit}
+.note:focus{outline:none;background:#fff;color:var(--ink)}
+
+/* option */
+.opt{border-bottom:1px solid var(--line2)}
+.opt:last-of-type{border-bottom:none}
+.opt-head{display:flex;align-items:center;gap:10px;padding:9px 14px;flex-wrap:wrap}
+.opt.chosen{background:var(--green-soft)}
+.opt.chosen .opt-head{box-shadow:inset 4px 0 0 var(--green)}
+.opt-head .use{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.opt-head .use input{accent-color:var(--green);width:15px;height:15px}
+.opt-name{font-weight:700;font-size:14px;flex:1 1 180px;min-width:140px;background:transparent;border:none;padding:5px 6px;color:var(--navy2);border-radius:6px}
+.opt-name:hover{background:#fff}
+.opt-name:focus{outline:none;background:#fff;box-shadow:0 0 0 2px var(--green-soft)}
+.pill{font-size:9.5px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;background:var(--navy);color:#fff;white-space:nowrap}
+.opt-totals{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-left:auto}
+.tot{text-align:right;min-width:78px}
+.tot .lab{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;font-weight:600}
+.tot .val{font-size:17px;font-weight:700;color:var(--navy)}
+.delta{text-align:right;min-width:96px;padding:4px 10px;border-radius:8px;font-weight:700}
+.delta.pos{background:#eaf6ee;color:var(--green)}
+.delta.neg{background:var(--red-soft);color:var(--red)}
+.delta .lab{display:block;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;opacity:.8}
+.delta .val{font-size:14.5px}
+.delta .verdict{display:block;font-size:9px;font-weight:600}
+.opt-del{background:transparent;border:none;color:#b9c4d4;cursor:pointer;font-size:16px;padding:0 4px;line-height:1}
+.opt-del:hover{color:var(--red)}
+
+/* table */
+table{width:100%;border-collapse:collapse}
+thead th{font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);text-align:left;padding:7px 14px 5px;font-weight:700;background:#fff}
+thead th.num{text-align:right}
+.opt.chosen thead th{background:transparent}
+tbody td{padding:5px 14px;border-top:1px solid var(--line2);vertical-align:middle}
+tbody td.num{text-align:right}
+.cutname{background:transparent;border:none;font-weight:600;color:var(--navy2);width:100%;min-width:130px;padding:5px 6px;font-family:inherit;font-size:13px;border-radius:6px}
+.cutname:hover{background:#f3f6fb}
+.cutname:focus{outline:none;background:#fff;box-shadow:0 0 0 2px var(--green-soft)}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+input.n{width:74px;border:1px solid var(--line);border-radius:6px;padding:6px 7px;font-size:13px;text-align:right;font-family:inherit;color:var(--ink);background:#fff;transition:border-color .12s,box-shadow .12s}
+input.n:hover{border-color:#cdd8e6}
+input.n:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px var(--green-soft)}
+.dollar{font-weight:700;color:var(--navy)}
+.be{margin-left:6px;border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:6px;width:26px;height:28px;cursor:pointer;font-size:13px;vertical-align:middle;transition:.12s}
+.be:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.rowdel{background:transparent;border:none;color:#c6d0dd;cursor:pointer;font-size:15px}
+.rowdel:hover{color:var(--red)}
+.flash{animation:fl 1s ease}
+@keyframes fl{0%{background:var(--green);color:#fff}100%{background:#fff}}
+.addrow{margin:8px 14px 12px;background:#fff;border:1px solid var(--line);color:var(--navy-soft);border-radius:7px;padding:7px 12px;cursor:pointer;font-size:12px;font-weight:600}
+.addrow:hover{border-color:var(--green);color:var(--green);background:var(--green-soft)}
+.addopt{margin:0 14px 14px;background:var(--panel2);border:1px solid var(--line);color:var(--navy);border-radius:7px;padding:8px 14px;cursor:pointer;font-size:12.5px;font-weight:700}
+.addopt:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* bottom bar */
+.bottombar{position:fixed;left:0;right:0;bottom:0;background:var(--navy);color:#fff;display:flex;align-items:center;gap:18px;padding:11px 22px;box-shadow:0 -2px 14px rgba(13,43,78,.22);flex-wrap:wrap;z-index:30}
+.bottombar .gt{font-size:13px;color:#aebfd6;display:flex;align-items:baseline;gap:10px}
+.bottombar .gt b{font-size:23px;color:#fff;font-weight:700}
+.bottombar .perkg{font-size:12px;color:var(--brand-green);font-weight:600}
+.bottombar .bd{margin-left:auto;background:transparent;border:1px solid var(--navy-soft);color:#cfdbec;border-radius:7px;padding:7px 13px;cursor:pointer;font-size:12px;font-weight:600}
+.bottombar .bd:hover{background:var(--navy2);color:#fff}
+.bdpanel{position:fixed;right:16px;bottom:62px;width:340px;max-height:62vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(13,43,78,.28);padding:14px 16px;z-index:31;display:none}
+.bdpanel h3{margin:0 0 10px;font-size:13px;color:var(--navy)}
+.bdpanel .ln{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--line2);gap:10px}
+.bdpanel .ln span:first-child{color:var(--muted)}
+.bdpanel .ln b{color:var(--navy);white-space:nowrap}
+
+@media(max-width:660px){
+  .topbar{padding:12px 16px}
+  .topbar .ti{border-left:none;padding-left:0}
+  .topbar h1{font-size:15px}
+  .controls,.tabs,.wrap{padding-left:14px;padding-right:14px}
+  thead{display:none}
+  tbody td{display:flex;justify-content:space-between;align-items:center;border:none;padding:4px 14px}
+  tbody td::before{content:attr(data-l);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.3px;margin-right:10px}
+  tbody td.cut::before{content:""}
+  tbody tr{border-top:1px solid var(--line2);display:block;padding:6px 0}
+  .opt-totals{margin-left:0;width:100%;justify-content:flex-end}
+  .bdpanel{left:14px;right:14px;width:auto}
+}
+/* ===== side-by-side option tiles ===== */
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.opt{border:none;background:var(--card);display:flex;flex-direction:column}
+.opt.chosen{background:var(--green-soft)}
+.opt.chosen .opt-head{box-shadow:none;border-bottom:2px solid var(--green)}
+.opt-head{display:block;padding:10px 12px;background:transparent;border-bottom:1px solid var(--line2)}
+.opt-top{display:flex;align-items:center;gap:8px}
+.opt-name{flex:1 1 auto;min-width:0;font-size:13.5px}
+.opt-totals{display:flex;align-items:center;gap:10px;margin:8px 0 0;flex-wrap:wrap}
+.tot{min-width:auto}
+.tot .lab{font-size:8.5px}
+.tot .val{font-size:16px}
+.delta{min-width:0;padding:3px 8px}
+.crows{flex:1 1 auto}
+.crow{padding:7px 12px;border-top:1px solid var(--line2)}
+.crow:first-child{border-top:none}
+.cutname{width:100%;font-size:12.5px;padding:3px 5px;margin-bottom:4px}
+.cflds{display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap}
+.fld{display:flex;flex-direction:column;gap:2px}
+.fld i{font-style:normal;font-size:8.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);font-weight:700}
+.fld.out{margin-left:auto;text-align:right;align-items:flex-end}
+input.n.sm{width:60px;padding:4px 5px;font-size:12px}
+.pwrap{display:flex;align-items:center}
+.be{width:22px;height:26px;font-size:12px;margin-left:3px}
+.rv{font-size:13.5px;padding-top:4px;display:inline-block}
+.rowdel{align-self:flex-end;font-size:13px;padding-bottom:3px;margin-left:2px}
+.addrow{margin:6px 10px 10px;padding:5px 9px;font-size:11.5px}
+@media(max-width:560px){.opts{grid-template-columns:1fr}}
+
+/* ===== login screen ===== */
+#authGate{position:fixed;inset:0;background:linear-gradient(160deg,#0d2b4e 0%,#163c66 60%,#22507f 100%);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+#authGate.hidden{display:none}
+.auth-card{background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.35);width:100%;max-width:380px;overflow:hidden}
+.auth-head{background:var(--card);border-bottom:3px solid var(--brand-green);padding:20px 24px 16px;text-align:center}
+.auth-head h1{margin:8px 0 2px;font-size:18px;color:var(--navy)}
+.auth-head p{margin:0;font-size:12px;color:var(--muted)}
+.auth-tabs{display:flex;border-bottom:1px solid var(--line)}
+.auth-tabs button{flex:1;background:#fff;border:none;padding:12px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.auth-tabs button.active{color:var(--navy);border-bottom-color:var(--brand-green)}
+.auth-body{padding:20px 24px 24px}
+.auth-body label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin:0 0 5px}
+.auth-body input{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;margin-bottom:14px;color:var(--ink)}
+.auth-body input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px var(--green-soft)}
+.auth-body .submit{width:100%;background:var(--navy);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer}
+.auth-body .submit:hover{background:var(--navy2)}
+.auth-body .submit:disabled{opacity:.6;cursor:default}
+.auth-msg{font-size:12.5px;margin:0 0 12px;min-height:0;border-radius:8px;padding:0;line-height:1.4}
+.auth-msg.show{padding:9px 11px;margin-bottom:14px}
+.auth-msg.err{background:var(--red-soft);color:var(--red)}
+.auth-msg.ok{background:var(--green-soft);color:var(--green)}
+.auth-cfg{background:#fff7e6;border:1px solid #f0d9a8;color:#8a6d2f;font-size:12px;padding:12px 14px;border-radius:10px;margin:0 24px 20px;line-height:1.5}
+.auth-cfg code{background:#fbeecb;padding:1px 4px;border-radius:4px}
+#appRoot.gated{display:none}
+.rolechip{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;background:var(--green-soft);color:var(--green);border:1px solid var(--green-line);border-radius:20px;padding:2px 8px}
+/* locked (read-only) fields for price-entry users — only $/kg stays editable */
+input.n[readonly]{background:#f3f6fb;border-color:var(--line2);color:var(--navy2);cursor:default}
+input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
+.title[readonly]:hover,.opt-name[readonly]:hover,.cutname[readonly]:hover{background:transparent;box-shadow:none}
+.title[readonly]:focus,.opt-name[readonly]:focus,.cutname[readonly]:focus{background:transparent;box-shadow:none}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN GATE ===================== -->
+<div id="authGate">
+  <div class="auth-card">
+    <div class="auth-head">
+      <h1>Cut Options</h1>
+      <p>Sign in to your account</p>
+    </div>
+    <div class="auth-tabs" id="authTabs">
+      <button data-mode="signin" class="active">Sign in</button>
+      <button data-mode="signup">Create account</button>
+    </div>
+    <form class="auth-body" id="authForm">
+      <div class="auth-msg" id="authMsg"></div>
+      <label for="authUser">Username</label>
+      <input id="authUser" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="e.g. boning-room">
+      <label for="authPass">Password</label>
+      <input id="authPass" type="password" autocomplete="current-password" placeholder="••••••••">
+      <button class="submit" id="authSubmit" type="submit">Sign in</button>
+    </form>
+    <div class="auth-cfg" id="authCfg" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="appRoot" class="gated">
+<div class="topbar">
+  <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABQAVADASIAAhEBAxEB/8QAHQABAAIDAQEBAQAAAAAAAAAAAAUGBAcIAwIBCf/EAE8QAAEDAwIDBAYDCwkECwAAAAECAwQABREGBxIhMQgTQVEUIjJhcZEVobEWIzM4YnJ0gbKzwiQ2N3N1wcPR8DRCduEXNUNSU2SCkqLS8f/EABsBAQADAQEBAQAAAAAAAAAAAAACAwQBBQYH/8QAOBEAAQMCBAIGBwcFAAAAAAAAAQACAwQREiExQRNRBSJxodHwBhQyYYGRwTNCUmJysfEVJEOC4f/aAAwDAQACEQMRAD8A7LpSlESlKURKUpREpSvN19lpSUuvNoKvZClAZoi9KUpREpSlESlKURKUpToiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlfDzLTyCh5pDiT1StII+tfdK4RcWK6KPg2W1wJDsiDCZjvOp4VKbTjl8OlUW77by3JS34tzS93i+JffJwrmefMcq2VSsNT0bTVLQx7chpbL9lW+Fjxh1iFnQY7cSGzFZBDbSAhIPgBX3SlbgAuYWLklKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIlKUoiUpSiJSlKIv//Z" alt="Thomas Foods International">
+  <div class="ti">
+    <h1>Cut Options &mdash; Equivalent Value</h1>
+    <p>Edit anything. Pick a route per primal with &ldquo;use&rdquo;. Tap &#9678; on a price to solve the break-even $/kg that ties the reference. The bar below totals every selected route off one carcase.</p>
+  </div>
+  <div class="who">
+    <span>Signed in as <b id="whoName">—</b></span>
+    <span id="roleTag" class="rolechip"></span>
+    <button id="logoutBtn">Sign out</button>
+  </div>
+</div>
+<div class="controls">
+  <div class="carc">Carcase weight (kg) <input class="n" type="number" id="carcase" step="1"></div>
+  <div class="sep"></div>
+  <button class="btn" id="exportBtn">Export</button>
+  <button class="btn ghost" id="importBtn">Import</button>
+  <input type="file" id="importFile" accept="application/json" style="display:none">
+  <button class="btn ghost" id="resetBtn">Reset to sheet</button>
+  <span id="cloudStatus" style="font-size:11px;color:var(--muted);font-weight:600;align-self:center"></span>
+  <div class="legend">
+    <span><b>1st option = reference</b> (not boned)</span>
+    <span><b style="color:#2e8b46">&#9650; green</b> boning pays</span>
+    <span><b style="color:#c0392b">&#9660; red</b> leave whole</span>
+    <span><b>&#9678;</b> solve break-even $/kg</span>
+  </div>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="wrap" id="wrap"></div>
+
+<div class="bottombar">
+  <div class="gt">Selected routes &mdash; total off carcase <b id="grandTotal">$0.00</b></div>
+  <div class="perkg" id="perKg"></div>
+  <button class="bd" id="bdBtn">Breakdown &#9662;</button>
+</div>
+<div class="bdpanel" id="bdPanel"><h3>Selected route per primal</h3><div id="bdList"></div></div>
+</div><!-- /appRoot -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+/* ---------- default data (from BEEF_CUT_OPTIONS sheet) ----------
+   row = [cut, $ / kg, yield (fraction), labour $/head]  (labour optional, default 0)
+   kg-mode block: 3rd value is weight kg, no carcase applied. */
+const DEFAULTS={
+  carcase:400,
+  cats:{
+  "LOINS":[
+    {title:"TENDERLOIN",
+     options:[
+      {name:"Whole — TDR SS/on",rows:[["TDR SS/on",30,0.015,0]]},
+      {name:"Denuded — SS/off",rows:[["TDR SS/off",36,0.0135,5],["Trim 85cl",2.6,0.0015,0],["Fat",0,0,0]]}]},
+    {title:"1 RIB SHORTLOIN VS STRIPLOIN",
+     options:[
+      {name:"Whole shortloin",rows:[["1RIB S/LOIN",17,0.052,10],["TDR Butt",28.25,0.008,0]]},
+      {name:"Striploin + TDR SS/on",rows:[["STRIPLOIN",20,0.032,0],["TDR ss/on",33.75,0.015,0],["Trim 80cl",3.6,0.003,0],["Fat & Bone",0.8,0.01,0]]},
+      {name:"Striploin Steak Ready + TDR",rows:[["Striploin Steak Ready",20,0.029,0],["TDR ss/on",33.75,0.015,0],["Trim 80cl",3.6,0.003,0],["Fat & Bone",0.8,0.013,0]]}]},
+    {title:"0-Rib SHORTLOIN vs STRIPLOIN",
+     options:[
+      {name:"Whole shortloin",rows:[["0RIB S/LOIN",13.5,0.049,10],["TDR Butt",23,0.007,0]]},
+      {name:"0Rib Striploin + TDR",rows:[["0Rib STRIPLOIN",14.5,0.026,0],["TDR ss/on",32.79,0.014,0],["Trim 80cl",3.2,0.003,0],["Fat & Bone",1,0.01,0]]},
+      {name:"Steak-ready Strip + TDR",rows:[["Striploin s/ready",19.1,0.023,0],["Tdr ss/on",18.5,0.014,0],["Trim 80cl",2.8,0.004,0],["Fat & Bone",0,0.015,0]]}]},
+    {title:"7-Rib OP Rib vs CUBE ROLL",
+     options:[
+      {name:"Whole OP Rib",rows:[["OP RIB",33.58,0.04,10]]},
+      {name:"Cube Roll Boned",rows:[["CUBE ROLL",41.56,0.026,0],["Back Rib",12,0.0085,0],["Trim 80cl",7.6,0.002,0],["Fat & Bone",0.6,0.0035,0]]}]},
+    {title:"7-Rib Tomahawk vs Full Bone Cube",
+     note:"Estimation only.",
+     options:[
+      {name:"Tomahawk",rows:[["TOMAHAWK",11,0.052,15],["Trim 80cl",3.2,0.01,0],["Fat & Bone",0,0,0]]},
+      {name:"Cube Roll",rows:[["Cube Roll",18.5,0.026,0],["Chuck Rib",4.8,0.0072,0],["Short Rib",6.2,0.008,0],["Back Rib",6,0.0085,0],["Trim 80cl",3.2,0.007,0],["Fat & Bone",0.1,0.0053,0]]}]}
+  ],
+  "FQ CUTS":[
+    {title:"CLOD vs BOLAR + OYSTER",
+     options:[
+      {name:"Whole Clod",rows:[["CLOD",11.76,0.054,0]]},
+      {name:"Bolar + Oyster + Trim",rows:[["BOLAR",11.8,0.03,0],["OYSTER",14.22,0.015,0],["Trim 85cl",11.2,0.008,0],["Fat",0,0.001,0]]}]},
+    {title:"Clod vs DENUDED BLADE",
+     options:[
+      {name:"Whole Clod",rows:[["CLOD",4.7,0.054,0]]},
+      {name:"Denuded Blade",rows:[["Denuded blade",5.3,0.041,0],["85cl",3.7,0.0062,0],["65cl",2.65,0.005,0],["Fat",0.1,0.0018,0]]}]},
+    {title:"NECK BONES TRIMMED vs UNTRIMMED",
+     options:[
+      {name:"Untrimmed",rows:[["Untrimmed neck bone",1.9,0.01465,0]]},
+      {name:"Trimmed + whizz trim",rows:[["Trimmed neck bone",1.8,0.01162,1],["90cl whizz trim",3.8,0.00303,0]]}]},
+    {title:"PE Brisket DECKLE vs DECKLE OFF",
+     options:[
+      {name:"Whole PE Brisket",rows:[["PE BRISKET",12.44,0.036,0]]},
+      {name:"Deckle off",rows:[["PE DECKLE OFF",13.8,0.031,0],["Deckle",11.2,0.0035,0],["65cl",6.5,0.0015,0],["Fat",2.4,0,0]]}]},
+    {title:"WHOLE PEDO vs DENUDED ",
+     options:[
+      {name:"Whole PEDO",rows:[["PEDO",4.1,0.031,0]]},
+      {name:"Denuded PEDO",rows:[["Denuded PEDO",6.25,0.0125,0],["65cl",2.65,0.0185,0],["Fat",0.1,0,0]]}]},
+    {title:"PEDO vs PECTORAL MUSCLE (dingo trim)",
+     options:[
+      {name:"Whole PEDO",rows:[["PEDO",6.2,0.0351,0]]},
+      {name:"Pectoral muscle out",rows:[["Pectoral muscle",8.5,0.015,0],["65cl",2.5,0.0201,0],["Fat",0.1,0,0]]}]},
+    {title:"CHUCK ROLL",
+     options:[
+      {name:"Full Chuck",rows:[["FULL CHUCK",14.45,0.06,0]]},
+      {name:"Chuck Roll + trim",rows:[["CHUCK ROLL",14.88,0.044,0],["Trim 85cl",8.87,0.016,0]]},
+      {name:"Chuck Eye Roll + Tail Flap",rows:[["CHUCK EYE ROLL",15.67,0.039,0],["Chuck Tail Flap",20.09,0.004,0],["Trim 85cl",11.3,0.0045,0],["Chuck Roll End",10.93,0.0095,0],["Fat",3,0.003,0]]}]},
+    {title:"SHORT RIB",
+     options:[
+      {name:"Bone-in Short Rib",rows:[["B/IN SHORT RIB",17.5,0.008,0]]},
+      {name:"Boneless Short Rib",rows:[["B/LESS SHORT RIB",31,0.005,0],["Bone / waste",0.1,0.003,0]]}]},
+    {title:"CHUCK RIB",
+     options:[
+      {name:"Bone-in Chuck Rib",rows:[["B/IN CHUCK RIB",16.5,0.0072,0]]},
+      {name:"Boneless Chuck Rib",rows:[["B/LESS CHUCK RIB",22.5,0.006,0],["Bone / waste",0.1,0.0012,0]]}]},
+    {title:"Short + Chuck Rib — separate vs combined",
+     options:[
+      {name:"Separate (Short + Chuck, b/in)",rows:[["B/IN SHORT RIB",21,0.0093,0],["B/IN CHUCK RIB",19,0.0101,0]]},
+      {name:"Combined Short-Chuck Rib",rows:[["B/IN SHORT CHUCK RIB",18.5,0.0202,0]]}]}
+  ],
+  "HQ CUTS":[
+    {title:"INSIDE",
+     options:[
+      {name:"Whole Inside",rows:[["INSIDE",12.11,0.054,0]]},
+      {name:"Insco denuded",rows:[["INS-CO",12.97,0.04,0],["Trim 80cl",9,0.0115,0],["Fat",2,0.0025,0]]},
+      {name:"100VL red meat route",rows:[["100VL red meat",10.2,0.03,0.75],["Trim 80cl",3,0.0215,0],["Fat",0.6,0.0025,0]]}]},
+    {title:"SILVERSIDE",
+     options:[
+      {name:"Whole Silverside",rows:[["SILVERSIDE",10.5,0.07,0]]},
+      {name:"Outside + FDS + Shank",rows:[["OUTSIDE",4.2,0.054,0],["FDS",5,0.002,0],["Shank",4,0.0115,0],["Fat",1,0.0025,0]]},
+      {name:"Flats + Eyes (10mm)",rows:[["FLATS",11.5,0.034,0],["EYES 10mm",13,0.0125,0],["FDS",0,0.002,0],["Shank",0,0.0115,0],["Trim 80cl",11.3,0.0155,0],["Fat",3.5,0.0025,0]]},
+      {name:"Flat-Demark + Eye",rows:[["FLAT - Demark",7.5,0.028,0.75],["EYE",8.5,0.015,0],["FDS",5,0.002,0],["Shank",3.8,0.0115,0],["Trim 85cl",3.8,0.01,0],["Fat",1.65,0.0035,0]]}]},
+    {title:"RUMP",
+     options:[
+      {name:"Whole Rump (HAM 2090)",rows:[["RUMP",5.2,0.044,0]]},
+      {name:"Rump 2in tail + Tri-tip",rows:[["Rump 2\" tail",5.7,0.0395,0],["Tri-tip dnd",2.5,0.0035,0],["Fat",0.1,0.001,0]]},
+      {name:"D-Rump + Tri-tip",rows:[["D-RUMP",5.6,0.038,0],["Tri-tip dnd",4.8,0.005,0],["Trim 85cl",0,0.001,0]]},
+      {name:"Rostbiff + Tri-tip + Cap",rows:[["ROST BIFF",6.4,0.022,0],["Tri-tip dnd",4.8,0.005,0],["Cap 10mm",7.5,0.009,0],["Trim 85cl",3.2,0.005,0],["Fat",0.1,0.003,0]]},
+      {name:"Eye of Rump + Tri-tip",rows:[["Eye of Rump",10.5,0.0185,0],["Tri-tip EU",10.5,0.0075,0],["Cap 10mm",3.5,0.009,0],["Trim 85cl",3,0.009,0]]}]},
+    {title:"THICK FLANK",
+     options:[
+      {name:"Whole Thick Flank",rows:[["THICK FLANK",3.9,0.042,0]]},
+      {name:"Knuckle + trim",rows:[["KNUCKLE",4.6,0.034,0],["Trim 85cl",3.1,0.004,0],["Fat",0.1,0.004,0]]}]}
+  ],
+  "SHANK":[
+    {title:"FORE SHANK",
+     options:[
+      {name:"Bone-in Fore Shank",rows:[["B/IN FORE SHANK",5,0.02286,0],["Conical",9.5,0.00406,0],["Trim 85cl",5.1,0.01318,0],["Fat",0.6,0.00113,0],["Bone",0.2,0.0167,0],["Whiz trim",3,0.00079,0]]},
+      {name:"IW/VAC Shank Meat",rows:[["Shank meat",7.5,0.01575,0],["Conical",9.5,0.00406,0],["Trim 85cl",5.1,0.01318,0],["Fat",0.6,0.00113,0],["Bone",0.2,0.02353,0],["Whiz trim",3,0.00104,0]]},
+      {name:"Taiwan Shank",rows:[["Taiwan shank",9.5,0.00838,0],["Conical",9.5,0.00406,0],["Trim 85cl",5.1,0.02054,0],["Fat",0.6,0.00113,0],["Bone",0.2,0.02353,0],["Whiz trim",3,0.00104,0]]}]},
+    {title:"HIND SHANK",
+     options:[
+      {name:"Bone-in Hind Shank",rows:[["B/IN HINDSHANK",5,0.0245,0],["Trim 85cl",5.1,0.00043,0],["Fat",0.6,0.00112,0],["Bone",0.2,0.02096,0],["Whiz trim",3,0.00056,0],["Tip",0,0.0098,0]]},
+      {name:"IW/VAC Shank Meat",rows:[["Shank meat",7.5,0.01671,0],["Trim 85cl",5.1,0.00043,0],["Fat",0.6,0.00112,0],["Bone",0.2,0.02857,0],["Whiz trim",3,0.00071,0],["Tip",0,0.0098,0]]},
+      {name:"Taiwan Shank",rows:[["Taiwan shank",9.5,0.00522,0],["Trim 85cl",5.1,0.011,0],["Fat",0.6,0.00203,0],["Bone",0.2,0.02857,0],["Whiz trim",3,0.00071,0],["Tip",0,0.0098,0]]}]}
+  ],
+  "DENUDING":[
+    {title:"INSIDE",
+     note:"A-Beef: light/lean cows U10mm.",
+     options:[
+      {name:"Whole Inside",rows:[["INSIDE",5.8,0.054,0]]},
+      {name:"INSCO",rows:[["INS-CO",6.2,0.04,0],["Cap / trim 85cl",5,0.0115,0],["Fat",0.3,0.0025,0]]},
+      {name:"100VL red meat",rows:[["100VL red meat",6.8,0.0285,0.75],["Cap / trim 85cl",5,0.0235,0],["Fat / waste",0.3,0.002,0]]}]},
+    {title:"SILVERSIDE",
+     options:[
+      {name:"Whole Silverside",rows:[["SILVERSIDE",4.1,0.07,0]]},
+      {name:"Outside route",rows:[["OUTSIDE",4.1,0.054,0],["FDS",3.4,0.002,0],["Shank 90cl",3.4,0.0115,0],["Fat",3.4,0.0025,0]]},
+      {name:"Flats + Eyes",rows:[["FLATS",4.5,0.035,0],["EYES",4.5,0.015,0],["FDS",3.4,0.002,0],["Shank",3.4,0.0115,0],["90cl AF",3.05,0.004,0],["Fat",0.7,0.0025,0]]},
+      {name:"100VL Flats + Eyes",rows:[["100VL FLATS",5.1,0.017,0.75],["100VL EYES",5.1,0.009,0],["100VL wedge (SPB)",3.95,0.003,0],["FDS",3.7,0.002,0],["Shank",3.7,0.0115,0],["90cl AF",3.7,0.0225,0],["Fat",0.7,0.005,0]]}]}
+  ],
+  "TONGUE / CHEEK / TAIL":[
+    {title:"TONGUE CUT",
+     note:"Value = $/kg × cut weight (kg); carcase not applied. Target ≈ $22.80/head. ⌖ solves the $/kg each style needs to match the reference.",
+     mode:"kg",
+     options:[
+      {name:"Whole Frozen Tongue",rows:[["Frozen tongue",16,1.425,0]]},
+      {name:"Std Swiss cut + headmeat",rows:[["Std Ch Swiss cut",18.6,1.2,0],["Head meat trim",2.2,0.22,0]]},
+      {name:"Special Swiss cut + headmeat",rows:[["Special CH S/cut",21.59,1.04,0],["Head meat trim",2.2,0.16,0]]},
+      {name:"Crown CH tongue",rows:[["Crown CH tongue",31.89,0.715,0]]}]}
+  ]
+  }
+};
+
+const LS_KEY='cutOptionsState_v2';
+let uid=1; const nid=()=>'k'+(uid++);
+let state, active;
+
+function buildState(src){
+  const s={carcase:src.carcase||280,order:[],cats:{}};
+  Object.keys(src.cats).forEach(cat=>{
+    s.order.push(cat);
+    s.cats[cat]=src.cats[cat].map(blk=>({
+      id:nid(),title:blk.title,note:blk.note||'',mode:blk.mode||'pct',
+      include:blk.include!==false,sel:blk.sel||0,
+      options:blk.options.map(o=>({
+        id:nid(),name:o.name,
+        rows:o.rows.map(r=>({id:nid(),cut:r[0],price:+r[1]||0,q:+r[2]||0,labour:+(r[3]||0)}))
+      }))
+    }));
+  });
+  return s;
+}
+
+/* ===== Supabase config (from config.js) ===== */
+const CFG=window.CUT_OPTIONS_CONFIG||{};
+const SUPABASE_URL=CFG.SUPABASE_URL||'';
+const SUPABASE_KEY=CFG.SUPABASE_KEY||'';
+const EMAIL_DOMAIN=(CFG.USERNAME_EMAIL_DOMAIN||'cutoptions.local').replace(/^@/,'');
+const ADMIN_USERNAMES=(CFG.ADMIN_USERNAMES||['admin']).map(s=>String(s).trim().toLowerCase());
+const TEMPLATE_ID='global';
+let sb=null;
+try{ if(SUPABASE_URL&&SUPABASE_KEY&&window.supabase){ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); } }catch(e){}
+
+let currentUser=null;
+let isAdmin=false;                       // admin edits the master options; everyone else edits only $/kg
+function userLsKey(){ return (currentUser?LS_KEY+'_'+currentUser.id:LS_KEY)+'_overlay'; }
+function tmplLsKey(){ return LS_KEY+'_template'; }
+function setCloud(t){const el=document.getElementById('cloudStatus');if(el)el.textContent=t;}
+
+/* keep the id counter ahead of any ids already present in a loaded document */
+function bumpUid(s){let m=0;JSON.stringify(s).replace(/"k(\d+)"/g,(_,n)=>{m=Math.max(m,+n);return _;});uid=Math.max(uid,m+1);}
+
+/* ----- per-user overlay: regular users may change only the $/kg prices ----- */
+function extractOverlay(s){
+  const prices={};
+  s.order.forEach(cat=>(s.cats[cat]||[]).forEach(blk=>blk.options.forEach(o=>o.rows.forEach(r=>{prices[r.id]=r.price;}))));
+  return {prices};
+}
+function applyOverlay(tmpl,overlay){
+  const pr=(overlay&&overlay.prices)||{};
+  tmpl.order.forEach(cat=>(tmpl.cats[cat]||[]).forEach(blk=>blk.options.forEach(o=>o.rows.forEach(r=>{if(pr[r.id]!=null)r.price=+pr[r.id]||0;}))));
+  return tmpl;
+}
+
+let saveTimer=null;
+function save(){
+  try{
+    if(isAdmin) localStorage.setItem(tmplLsKey(),JSON.stringify(state));
+    else        localStorage.setItem(userLsKey(),JSON.stringify(extractOverlay(state)));
+  }catch(e){}
+  if(sb&&currentUser){clearTimeout(saveTimer);saveTimer=setTimeout(pushCloud,700);setCloud('saving…');}
+}
+async function pushCloud(){
+  if(!sb||!currentUser)return;
+  try{
+    let res;
+    if(isAdmin) res=await sb.from('cut_template').upsert({id:TEMPLATE_ID,data:state,updated_at:new Date().toISOString()});
+    else        res=await sb.from('app_state').upsert({user_id:currentUser.id,data:extractOverlay(state),updated_at:new Date().toISOString()});
+    setCloud(res.error?'⚠ not saved to cloud — kept on this device':'✓ saved to cloud');
+  }catch(e){setCloud('⚠ not saved to cloud — kept on this device');}
+}
+
+/* ----- the shared master template (admin-owned) ----- */
+async function loadTemplate(){
+  if(sb){
+    try{const {data,error}=await sb.from('cut_template').select('data').eq('id',TEMPLATE_ID).maybeSingle();
+      if(!error&&data&&data.data&&data.data.cats)return data.data;}
+    catch(e){}
+  }
+  try{const j=localStorage.getItem(tmplLsKey());if(j){const p=JSON.parse(j);if(p&&p.cats)return p;}}catch(e){}
+  return buildState(DEFAULTS);
+}
+async function loadOverlay(){
+  if(sb&&currentUser){
+    try{const {data,error}=await sb.from('app_state').select('data').eq('user_id',currentUser.id).maybeSingle();
+      if(!error&&data&&data.data)return data.data;}
+    catch(e){}
+  }
+  try{const j=localStorage.getItem(userLsKey());if(j)return JSON.parse(j);}catch(e){}
+  return {prices:{}};
+}
+async function loadInitial(){
+  const tmpl=await loadTemplate();
+  bumpUid(tmpl);
+  if(isAdmin){ setCloud(sb?'✓ admin — editing the master options':'local only · add Supabase keys to sync'); return tmpl; }
+  const overlay=await loadOverlay();
+  setCloud(sb?'✓ your $/kg on the master options':'local only · add Supabase keys to sync');
+  return applyOverlay(tmpl,overlay);
+}
+
+/* ---------- calc ---------- */
+const carc=()=>parseFloat(state.carcase)||0;
+function rowVal(blk,r){return blk.mode==='kg'? r.price*r.q : r.price*r.q*carc();}
+function optNet(blk,o){let v=0;o.rows.forEach(r=>{v+=rowVal(blk,r)-(+r.labour||0)});return v;}
+
+/* ---------- render ---------- */
+function render(){
+  // tabs
+  const tabs=document.getElementById('tabs');tabs.innerHTML='';
+  state.order.forEach(cat=>{
+    const b=document.createElement('button');b.className='tab'+(cat===active?' active':'');
+    b.innerHTML=`<span>${esc(cat)}</span>${isAdmin?'<span class="x" title="Delete category">✕</span>':''}`;
+    b.querySelector('span:first-child').onclick=()=>{active=cat;render();};
+    const x=b.querySelector('.x');if(x)x.onclick=(e)=>{e.stopPropagation();if(confirm('Delete category "'+cat+'" and all its primals?')){delete state.cats[cat];state.order=state.order.filter(c=>c!==cat);if(active===cat)active=state.order[0];save();render();}};
+    tabs.appendChild(b);
+  });
+  if(isAdmin){
+    const addc=document.createElement('button');addc.className='addcat';addc.textContent='+ Category';
+    addc.onclick=()=>{const n=prompt('New category name:');if(n&&!state.cats[n]){state.cats[n]=[];state.order.push(n);active=n;save();render();}};
+    tabs.appendChild(addc);
+  }
+
+  const wrap=document.getElementById('wrap');wrap.innerHTML='';
+  if(!active){active=state.order[0];}
+  (state.cats[active]||[]).forEach(blk=>wrap.appendChild(cardEl(blk)));
+  if(isAdmin){
+    const add=document.createElement('button');add.className='addprimal';add.textContent='+ Add primal to '+active;
+    add.onclick=()=>{const blk={id:nid(),title:'New primal',note:'',mode:'pct',include:true,sel:0,options:[{id:nid(),name:'Whole (reference)',rows:[{id:nid(),cut:'New cut',price:0,q:0,labour:0}]}]};state.cats[active].push(blk);save();render();};
+    wrap.appendChild(add);
+  }
+  recalc();
+}
+
+function cardEl(blk){
+  const card=document.createElement('div');card.className='card';
+  const head=document.createElement('div');head.className='card-head';
+  head.innerHTML=`<input class="title" value="${esc(blk.title)}" ${isAdmin?'':'readonly'}>
+    <label class="inc"><input type="checkbox" ${blk.include?'checked':''} data-inc ${isAdmin?'':'disabled'}> in total</label>
+    ${isAdmin?'<button class="del">✕ primal</button>':''}`;
+  if(isAdmin){
+    head.querySelector('.title').oninput=e=>{blk.title=e.target.value;save();recalc();};
+    head.querySelector('[data-inc]').onchange=e=>{blk.include=e.target.checked;save();recalc();};
+    head.querySelector('.del').onclick=()=>{if(confirm('Delete primal "'+blk.title+'"?')){state.cats[active]=state.cats[active].filter(b=>b!==blk);save();render();}};
+  }
+  card.appendChild(head);
+  if(blk.note!==undefined&&(isAdmin||blk.note)){
+    const n=document.createElement('input');n.className='note';n.style.cssText='width:100%;border:none';n.value=blk.note;n.placeholder='note (optional)';
+    if(isAdmin)n.oninput=e=>{blk.note=e.target.value;save();}; else n.readOnly=true;
+    card.appendChild(n);
+  }
+  const opts=document.createElement('div');opts.className='opts';
+  blk.options.forEach((o,oi)=>opts.appendChild(optEl(blk,o,oi)));
+  card.appendChild(opts);
+  if(isAdmin){
+    const ao=document.createElement('button');ao.className='addopt';ao.textContent='+ Add option / route';
+    ao.onclick=()=>{blk.options.push({id:nid(),name:'New route',rows:[{id:nid(),cut:'New cut',price:0,q:0,labour:0}]});save();render();};
+    card.appendChild(ao);
+  }
+  return card;
+}
+
+function optEl(blk,o,oi){
+  const isKg=blk.mode==='kg';
+  const opt=document.createElement('div');opt.className='opt'+(oi===0?' ref':'')+(blk.sel===oi?' chosen':'');
+  opt.dataset.opt=o.id;
+  const ro=isAdmin?'':'readonly';
+  const h=document.createElement('div');h.className='opt-head';
+  h.innerHTML=`<div class="opt-top">
+      <label class="use"><input type="radio" name="sel_${blk.id}" ${blk.sel===oi?'checked':''} ${isAdmin?'':'disabled'}> use</label>
+      <input class="opt-name" value="${esc(o.name)}" ${ro}>
+      ${oi===0?'<span class="pill">ref</span>':''}
+      ${isAdmin&&blk.options.length>1?'<button class="opt-del" title="Delete option">✕</button>':''}
+    </div>
+    <div class="opt-totals">
+      <div class="tot"><span class="lab">$ / head net</span><span class="val" data-net="${o.id}">–</span></div>
+      ${oi===0?'':`<div class="delta" data-delta="${o.id}"><span class="lab">vs ref</span><span class="val">–</span><span class="verdict"></span></div>`}
+    </div>`;
+  if(isAdmin){
+    h.querySelector('input[type=radio]').onchange=()=>{blk.sel=oi;save();recalc();render();};
+    h.querySelector('.opt-name').oninput=e=>{o.name=e.target.value;save();recalc();};
+    const od=h.querySelector('.opt-del');if(od)od.onclick=()=>{blk.options=blk.options.filter(x=>x!==o);if(blk.sel>=blk.options.length)blk.sel=0;save();render();};
+  }
+  opt.appendChild(h);
+
+  const body=document.createElement('div');body.className='crows';
+  const qlab=isKg?'kg':'yld %';
+  o.rows.forEach(r=>{
+    const row=document.createElement('div');row.className='crow';
+    const qShown=isKg?r.q:+(r.q*100).toFixed(4);
+    row.innerHTML=`<input class="cutname" value="${esc(r.cut)}" ${ro}>
+      <div class="cflds">
+        <label class="fld"><i>$/kg</i><span class="pwrap"><input class="n sm" type="number" step="0.01" value="${r.price}" data-f="price"><button class="be" title="Break-even $/kg">⌖</button></span></label>
+        <label class="fld"><i>${qlab}</i><input class="n sm" type="number" step="0.001" value="${qShown}" data-f="q" ${ro}></label>
+        <label class="fld"><i>lab $</i><input class="n sm" type="number" step="0.05" value="${r.labour}" data-f="labour" ${ro}></label>
+        <span class="fld out"><i>$/hd</i><span class="rv dollar" data-rowval="${r.id}">–</span></span>
+        ${isAdmin?'<button class="rowdel" title="Delete cut">✕</button>':''}
+      </div>`;
+    row.querySelector('[data-f=price]').oninput=e=>{r.price=parseFloat(e.target.value)||0;save();recalc();};
+    row.querySelector('.be').onclick=()=>solveBE(blk,oi,r,row.querySelector('[data-f=price]'));
+    if(isAdmin){
+      row.querySelector('.cutname').oninput=e=>{r.cut=e.target.value;save();recalc();};
+      row.querySelector('[data-f=q]').oninput=e=>{const v=parseFloat(e.target.value)||0;r.q=isKg?v:v/100;save();recalc();};
+      row.querySelector('[data-f=labour]').oninput=e=>{r.labour=parseFloat(e.target.value)||0;save();recalc();};
+      row.querySelector('.rowdel').onclick=()=>{o.rows=o.rows.filter(x=>x!==r);save();render();};
+    }
+    body.appendChild(row);
+  });
+  opt.appendChild(body);
+  if(isAdmin){
+    const ar=document.createElement('button');ar.className='addrow';ar.textContent='+ Add cut';
+    ar.onclick=()=>{o.rows.push({id:nid(),cut:'New cut',price:0,q:0,labour:0});save();render();};
+    opt.appendChild(ar);
+  }
+  return opt;
+}
+
+function solveBE(blk,oi,row,inp){
+  const isKg=blk.mode==='kg';const o=blk.options[oi];
+  let T;
+  if(oi===0){let best=-Infinity;blk.options.forEach((x,k)=>{if(k!==0)best=Math.max(best,optNet(blk,x))});T=(best===-Infinity?0:best);}
+  else T=optNet(blk,blk.options[0]);
+  let other=0,totLab=0;
+  o.rows.forEach(r=>{totLab+=(+r.labour||0);if(r!==row)other+=rowVal(blk,r);});
+  const f=isKg?row.q:row.q*carc();
+  if(f<=0){alert('This cut has 0 yield/weight — set that first, then ⌖ can solve a price.');return;}
+  const req=(T-other+totLab)/f;
+  row.price=+req.toFixed(2);inp.value=row.price;
+  inp.classList.remove('flash');void inp.offsetWidth;inp.classList.add('flash');
+  save();recalc();
+}
+
+function recalc(){
+  let grand=0;const bd=[];
+  state.order.forEach(cat=>{
+    (state.cats[cat]||[]).forEach(blk=>{
+      const baseNet=optNet(blk,blk.options[0]);
+      blk.options.forEach((o,oi)=>{
+        o.rows.forEach(r=>{const c=document.querySelector(`[data-rowval="${r.id}"]`);if(c)c.textContent='$'+rowVal(blk,r).toFixed(2);});
+        const net=optNet(blk,o);
+        const nc=document.querySelector(`[data-net="${o.id}"]`);if(nc)nc.textContent='$'+net.toFixed(2);
+        if(oi>0){const d=net-baseNet;const de=document.querySelector(`[data-delta="${o.id}"]`);
+          if(de){de.className='delta '+(d>=0?'pos':'neg');de.querySelector('.val').textContent=(d>=0?'+$':'-$')+Math.abs(d).toFixed(2);de.querySelector('.verdict').textContent=d>=0?'boning pays':'leave whole';}}
+      });
+      if(blk.include){const sn=optNet(blk,blk.options[blk.sel]||blk.options[0]);grand+=sn;bd.push([blk.title,(blk.options[blk.sel]||blk.options[0]).name,sn]);}
+    });
+  });
+  document.getElementById('grandTotal').textContent='$'+grand.toFixed(2);
+  const c=carc();document.getElementById('perKg').textContent=c>0?('= $'+(grand/c).toFixed(2)+' / kg carcase'):'';
+  const list=document.getElementById('bdList');
+  list.innerHTML=bd.length?bd.map(x=>`<div class="ln"><span>${esc(x[0])} — <i>${esc(x[1])}</i></span><b>$${x[2].toFixed(2)}</b></div>`).join('')+`<div class="ln" style="border:none;margin-top:6px"><span><b>TOTAL</b></span><b>$${grand.toFixed(2)}</b></div>`:'<div class="ln"><span>No primals included</span></div>';
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ---------- top controls ---------- */
+const carcInp=document.getElementById('carcase');
+const resetBtn=document.getElementById('resetBtn');
+const importBtn=document.getElementById('importBtn');
+carcInp.oninput=()=>{ if(!isAdmin)return; state.carcase=parseFloat(carcInp.value)||0;save();recalc();};
+resetBtn.onclick=()=>{
+  if(isAdmin){
+    if(confirm('Reset the master options to the original sheet values? This replaces what everyone sees.')){
+      try{localStorage.removeItem(tmplLsKey());}catch(e){}
+      state=buildState(DEFAULTS);active=state.order[0];carcInp.value=state.carcase;save();render();
+    }
+  }else{
+    if(confirm('Reset your $/kg back to the master prices?')){
+      try{localStorage.removeItem(userLsKey());}catch(e){}
+      if(sb&&currentUser){try{sb.from('app_state').delete().eq('user_id',currentUser.id);}catch(e){}}
+      startApp();
+    }
+  }
+};
+document.getElementById('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='cut_options_data.json';a.click();};
+importBtn.onclick=()=>{ if(isAdmin) document.getElementById('importFile').click(); };
+document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const p=JSON.parse(rd.result);if(p&&p.cats){state=p;bumpUid(state);active=state.order[0];carcInp.value=state.carcase;save();render();}else alert('Not a valid cut-options file.');}catch(err){alert('Could not read that file.');}};rd.readAsText(f);};
+const bdPanel=document.getElementById('bdPanel');
+document.getElementById('bdBtn').onclick=()=>{bdPanel.style.display=bdPanel.style.display==='block'?'none':'block';};
+
+/* enable/disable the role-specific toolbar controls */
+function applyRole(){
+  carcInp.readOnly=!isAdmin;
+  importBtn.style.display=isAdmin?'':'none';
+  resetBtn.textContent=isAdmin?'Reset to sheet':'Reset my $/kg';
+  document.getElementById('roleTag').textContent=isAdmin?'admin':'price entry';
+}
+
+/* ---------- start the app (after auth) ---------- */
+async function startApp(){
+  state=await loadInitial();active=state.order[0];carcInp.value=state.carcase;render();
+  // make sure a master template exists in the cloud for everyone else to read
+  if(isAdmin&&sb&&currentUser)save();
+}
+
+/* =====================================================
+   AUTH — username + password via Supabase
+   ===================================================== */
+const gate=document.getElementById('authGate');
+const appRoot=document.getElementById('appRoot');
+const authForm=document.getElementById('authForm');
+const authUser=document.getElementById('authUser');
+const authPass=document.getElementById('authPass');
+const authSubmit=document.getElementById('authSubmit');
+const authMsg=document.getElementById('authMsg');
+const authTabs=document.getElementById('authTabs');
+const authCfg=document.getElementById('authCfg');
+let authMode='signin';
+
+function usernameToEmail(u){
+  const clean=String(u).trim().toLowerCase().replace(/[^a-z0-9._-]/g,'');
+  return clean+'@'+EMAIL_DOMAIN;
+}
+function emailToUsername(e){ return String(e||'').split('@')[0]; }
+function showMsg(text,kind){
+  authMsg.textContent=text;
+  authMsg.className='auth-msg show '+(kind||'');
+  if(!text)authMsg.className='auth-msg';
+}
+function setMode(m){
+  authMode=m;
+  [...authTabs.children].forEach(b=>b.classList.toggle('active',b.dataset.mode===m));
+  authSubmit.textContent=(m==='signup')?'Create account':'Sign in';
+  authPass.setAttribute('autocomplete',m==='signup'?'new-password':'current-password');
+  showMsg('');
+}
+authTabs.querySelectorAll('button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+if(CFG.ALLOW_SIGNUP===false){
+  const su=authTabs.querySelector('[data-mode="signup"]');if(su)su.style.display='none';
+}
+
+function showGate(){gate.classList.remove('hidden');appRoot.classList.add('gated');}
+function hideGate(){gate.classList.add('hidden');appRoot.classList.remove('gated');}
+
+async function enterApp(user){
+  currentUser=user;
+  const uname=emailToUsername(user.email);
+  isAdmin=ADMIN_USERNAMES.includes(String(uname).toLowerCase());
+  document.getElementById('whoName').textContent=uname;
+  applyRole();
+  hideGate();
+  await startApp();
+}
+
+authForm.addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  if(!sb){showMsg('Supabase is not configured yet — add your URL and key to config.js.','err');return;}
+  const u=authUser.value.trim();
+  const p=authPass.value;
+  if(!u){showMsg('Enter a username.','err');return;}
+  if(!p||p.length<6){showMsg('Password must be at least 6 characters.','err');return;}
+  const email=usernameToEmail(u);
+  authSubmit.disabled=true;
+  try{
+    if(authMode==='signup'){
+      showMsg('Creating your account…','ok');
+      const {data,error}=await sb.auth.signUp({email,password:p});
+      if(error){showMsg(error.message,'err');return;}
+      if(data.session&&data.user){ await enterApp(data.user); return; }
+      // No session returned → email confirmation is on (not ideal for usernames)
+      showMsg('Account created. Try signing in now.','ok');
+      setMode('signin');
+    }else{
+      showMsg('Signing in…','ok');
+      const {data,error}=await sb.auth.signInWithPassword({email,password:p});
+      if(error){
+        showMsg(/invalid login/i.test(error.message)?'Wrong username or password.':error.message,'err');
+        return;
+      }
+      await enterApp(data.user);
+    }
+  }catch(err){
+    showMsg('Something went wrong — check your connection and try again.','err');
+  }finally{
+    authSubmit.disabled=false;
+  }
+});
+
+document.getElementById('logoutBtn').onclick=async()=>{
+  if(sb){try{await sb.auth.signOut();}catch(e){}}
+  currentUser=null;isAdmin=false;
+  authPass.value='';
+  showGate();
+  setMode('signin');
+};
+
+/* ---------- boot ---------- */
+(async()=>{
+  if(!sb){
+    authCfg.style.display='block';
+    authCfg.innerHTML='⚙️ <b>Setup needed.</b> Open <code>config.js</code> and paste your Supabase <code>SUPABASE_URL</code> and <code>SUPABASE_KEY</code>, then reload. See <code>README.md</code> for the full setup.';
+    authSubmit.disabled=true;
+    showGate();
+    return;
+  }
+  try{
+    const {data}=await sb.auth.getSession();
+    if(data&&data.session&&data.session.user){ await enterApp(data.session.user); return; }
+  }catch(e){}
+  showGate();
+})();
+</script>
+</body>
+</html>
