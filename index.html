@@ -451,15 +451,25 @@ function setCloud(t){const el=document.getElementById('cloudStatus');if(el)el.te
 /* keep the id counter ahead of any ids already present in a loaded document */
 function bumpUid(s){let m=0;JSON.stringify(s).replace(/"k(\d+)"/g,(_,n)=>{m=Math.max(m,+n);return _;});uid=Math.max(uid,m+1);}
 
-/* ----- per-user overlay: regular users may change only the $/kg prices ----- */
+/* ----- per-user overlay: prices + route selection + include toggle ----- */
 function extractOverlay(s){
-  const prices={};
-  s.order.forEach(cat=>(s.cats[cat]||[]).forEach(blk=>blk.options.forEach(o=>o.rows.forEach(r=>{prices[r.id]=r.price;}))));
-  return {prices};
+  const prices={};const selections={};
+  s.order.forEach(cat=>(s.cats[cat]||[]).forEach(blk=>{
+    selections[blk.id]={sel:blk.sel,include:blk.include};
+    blk.options.forEach(o=>o.rows.forEach(r=>{prices[r.id]=r.price;}));
+  }));
+  return {prices,selections};
 }
 function applyOverlay(tmpl,overlay){
   const pr=(overlay&&overlay.prices)||{};
-  tmpl.order.forEach(cat=>(tmpl.cats[cat]||[]).forEach(blk=>blk.options.forEach(o=>o.rows.forEach(r=>{if(pr[r.id]!=null)r.price=+pr[r.id]||0;}))));
+  const sel=(overlay&&overlay.selections)||{};
+  tmpl.order.forEach(cat=>(tmpl.cats[cat]||[]).forEach(blk=>{
+    if(sel[blk.id]!=null){
+      if(sel[blk.id].sel!=null)blk.sel=sel[blk.id].sel;
+      if(sel[blk.id].include!=null)blk.include=sel[blk.id].include;
+    }
+    blk.options.forEach(o=>o.rows.forEach(r=>{if(pr[r.id]!=null)r.price=+pr[r.id]||0;}));
+  }));
   return tmpl;
 }
 
@@ -546,13 +556,13 @@ function cardEl(blk){
   const card=document.createElement('div');card.className='card';
   const head=document.createElement('div');head.className='card-head';
   head.innerHTML=`<input class="title" value="${esc(blk.title)}" ${isAdmin?'':'readonly'}>
-    <label class="inc"><input type="checkbox" ${blk.include?'checked':''} data-inc ${isAdmin?'':'disabled'}> in total</label>
+    <label class="inc"><input type="checkbox" ${blk.include?'checked':''} data-inc> in total</label>
     ${isAdmin?'<button class="del">✕ primal</button>':''}`;
   if(isAdmin){
     head.querySelector('.title').oninput=e=>{blk.title=e.target.value;save();recalc();};
-    head.querySelector('[data-inc]').onchange=e=>{blk.include=e.target.checked;save();recalc();};
     head.querySelector('.del').onclick=()=>{if(confirm('Delete primal "'+blk.title+'"?')){state.cats[active]=state.cats[active].filter(b=>b!==blk);save();render();}};
   }
+  head.querySelector('[data-inc]').onchange=e=>{blk.include=e.target.checked;save();recalc();};
   card.appendChild(head);
   if(blk.note!==undefined&&(isAdmin||blk.note)){
     const n=document.createElement('input');n.className='note';n.style.cssText='width:100%;border:none';n.value=blk.note;n.placeholder='note (optional)';
@@ -577,7 +587,7 @@ function optEl(blk,o,oi){
   const ro=isAdmin?'':'readonly';
   const h=document.createElement('div');h.className='opt-head';
   h.innerHTML=`<div class="opt-top">
-      <label class="use"><input type="radio" name="sel_${blk.id}" ${blk.sel===oi?'checked':''} ${isAdmin?'':'disabled'}> use</label>
+      <label class="use"><input type="radio" name="sel_${blk.id}" ${blk.sel===oi?'checked':''}> use</label>
       <input class="opt-name" value="${esc(o.name)}" ${ro}>
       ${oi===0?'<span class="pill">ref</span>':''}
       ${isAdmin&&blk.options.length>1?'<button class="opt-del" title="Delete option">✕</button>':''}
@@ -586,8 +596,8 @@ function optEl(blk,o,oi){
       <div class="tot"><span class="lab">$ / head net</span><span class="val" data-net="${o.id}">–</span></div>
       ${oi===0?'':`<div class="delta" data-delta="${o.id}"><span class="lab">vs ref</span><span class="val">–</span><span class="verdict"></span></div>`}
     </div>`;
+  h.querySelector('input[type=radio]').onchange=()=>{blk.sel=oi;save();recalc();render();};
   if(isAdmin){
-    h.querySelector('input[type=radio]').onchange=()=>{blk.sel=oi;save();recalc();render();};
     h.querySelector('.opt-name').oninput=e=>{o.name=e.target.value;save();recalc();};
     const od=h.querySelector('.opt-del');if(od)od.onclick=()=>{blk.options=blk.options.filter(x=>x!==o);if(blk.sel>=blk.options.length)blk.sel=0;save();render();};
   }
