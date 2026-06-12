@@ -30,8 +30,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 
 /* toolbar */
 .controls{background:var(--card);border-bottom:1px solid var(--line);padding:10px 22px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.controls .carc{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--navy);font-size:13px}
-.controls .carc input{width:80px}
+.controls .carc{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--navy);font-size:13px;background:var(--green-soft);border:1.5px solid var(--green-line);border-radius:10px;padding:8px 14px;box-shadow:0 1px 3px rgba(46,139,70,.12)}
+.controls .carc input{width:90px;font-size:15px;font-weight:700;text-align:center;border:1.5px solid var(--green);background:#fff;color:var(--navy);padding:7px 8px}
+.controls .carc input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+.controls .carc input:read-only{background:#f3f6fb;border-color:var(--line2);color:var(--navy2)}
 .controls .sep{flex:1 1 12px}
 .btn{background:var(--navy);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-weight:600;cursor:pointer;font-size:12.5px;transition:background .15s}
 .btn:hover{background:var(--navy2)}
@@ -39,6 +41,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 .btn.ghost:hover{background:var(--panel);border-color:var(--navy-soft)}
 .legend{display:flex;gap:16px;font-size:11px;color:var(--muted);flex-wrap:wrap;align-items:center;width:100%;padding-top:4px;border-top:1px dashed var(--line2);margin-top:2px}
 .legend b{color:var(--navy)}
+.curchip{font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--navy);background:#fff;border:1px solid var(--navy-soft);border-radius:20px;padding:6px 12px;white-space:nowrap}
 
 /* tabs */
 .tabs{display:flex;flex-wrap:wrap;gap:6px;background:var(--bg);padding:16px 22px;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
@@ -112,8 +115,9 @@ input.n{width:74px;border:1px solid var(--line);border-radius:6px;padding:6px 7p
 input.n:hover{border-color:#cdd8e6}
 input.n:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px var(--green-soft)}
 .dollar{font-weight:700;color:var(--navy)}
-.be{margin-left:6px;border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:6px;width:26px;height:28px;cursor:pointer;font-size:13px;vertical-align:middle;transition:.12s}
-.be:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.be{margin-left:6px;border:1px solid var(--green);background:var(--green-soft);color:var(--green);border-radius:6px;width:30px;height:28px;cursor:pointer;font-size:15px;font-weight:700;vertical-align:middle;transition:.12s;box-shadow:0 1px 2px rgba(46,139,70,.18)}
+.be:hover{background:var(--green);color:#fff;border-color:var(--green);transform:translateY(-1px);box-shadow:0 2px 6px rgba(46,139,70,.35)}
+.be:active{transform:translateY(0)}
 .rowdel{background:transparent;border:none;color:#c6d0dd;cursor:pointer;font-size:15px}
 .rowdel:hover{color:var(--red)}
 .flash{animation:fl 1s ease}
@@ -173,7 +177,7 @@ input.n:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px var(--
 .fld.out{margin-left:auto;text-align:right;align-items:flex-end}
 input.n.sm{width:60px;padding:4px 5px;font-size:12px}
 .pwrap{display:flex;align-items:center}
-.be{width:22px;height:26px;font-size:12px;margin-left:3px}
+.be{width:26px;height:26px;font-size:13px;margin-left:3px}
 .rv{font-size:13.5px;padding-top:4px;display:inline-block}
 .rowdel{align-self:flex-end;font-size:13px;padding-bottom:3px;margin-left:2px}
 .addrow{margin:6px 10px 10px;padding:5px 9px;font-size:11.5px}
@@ -251,7 +255,8 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
   </div>
 </div>
 <div class="controls">
-  <div class="carc">Carcase weight (kg) <input class="n" type="number" id="carcase" step="1"></div>
+  <div class="carc"><span>Carcase weight</span> <input class="n" type="number" id="carcase" step="1"> <span style="font-weight:600;color:var(--green)">kg</span></div>
+  <span class="curchip">All prices AUD &middot; FOB</span>
   <div class="sep"></div>
   <button class="btn" id="exportBtn">Export</button>
   <button class="btn ghost" id="importBtn">Import</button>
@@ -262,14 +267,15 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
     <span><b>1st option = reference</b> (not boned)</span>
     <span><b style="color:#2e8b46">&#9650; green</b> boning pays</span>
     <span><b style="color:#c0392b">&#9660; red</b> leave whole</span>
-    <span><b>&#9678;</b> solve break-even $/kg</span>
+    <span><b style="color:#2e8b46">&#9678;</b> solve break-even $/kg</span>
+    <span>All $ values are <b>AUD, FOB</b></span>
   </div>
 </div>
 <div class="tabs" id="tabs"></div>
 <div class="wrap" id="wrap"></div>
 
 <div class="bottombar">
-  <div class="gt">Selected routes &mdash; total off carcase <b id="grandTotal">$0.00</b></div>
+  <div class="gt">Selected routes &mdash; total off carcase <b id="grandTotal">$0.00</b> <span style="font-size:12px;color:var(--brand-green)">AUD FOB</span></div>
   <div class="perkg" id="perKg"></div>
   <button class="bd" id="bdBtn">Breakdown &#9662;</button>
 </div>
@@ -619,7 +625,7 @@ function optEl(blk,o,oi){
     const qShown=isKg?r.q:+(r.q*100).toFixed(4);
     row.innerHTML=`<input class="cutname" value="${esc(r.cut)}" ${ro}>
       <div class="cflds">
-        <label class="fld"><i>$/kg</i><span class="pwrap"><input class="n sm" type="number" step="0.01" value="${r.price}" data-f="price"><button class="be" title="Break-even $/kg">⌖</button></span></label>
+        <label class="fld"><i>$/kg AUD</i><span class="pwrap"><input class="n sm" type="number" step="0.01" value="${r.price}" data-f="price"><button class="be" title="Solve break-even $/kg">⌖</button></span></label>
         <label class="fld"><i>${qlab}</i><input class="n sm" type="number" step="0.001" value="${qShown}" data-f="q" ${ro}></label>
         <label class="fld"><i>lab $</i><input class="n sm" type="number" step="0.05" value="${r.labour}" data-f="labour"></label>
         <span class="fld out"><i>$/hd</i><span class="rv dollar" data-rowval="${r.id}">–</span></span>
