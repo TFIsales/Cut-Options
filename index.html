@@ -985,6 +985,7 @@ function setMode(m){
 authTabs.querySelectorAll('button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
 if(CFG.ALLOW_SIGNUP===false){
   const su=authTabs.querySelector('[data-mode="signup"]');if(su)su.style.display='none';
+  authTabs.style.display='none';
 }
 
 function showGate(){gate.classList.remove('hidden');appRoot.classList.add('gated');}
