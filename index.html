@@ -576,7 +576,6 @@ function applyOverlay(tmpl,overlay){
   tmpl.order.forEach(cat=>(tmpl.cats[cat]||[]).forEach(blk=>{
     if(sel[blk.id]!=null){
       if(sel[blk.id].sel!=null)blk.sel=sel[blk.id].sel;
-      if(sel[blk.id].include!=null)blk.include=sel[blk.id].include;
     }
     blk.options.forEach(o=>o.rows.forEach(r=>{
       if(rv[r.id]!=null){
@@ -628,6 +627,8 @@ async function loadOverlay(){
 async function loadInitial(){
   const tmpl=await loadTemplate();
   bumpUid(tmpl);
+  /* default: nothing ticked into the total on load */
+  (tmpl.order||[]).forEach(cat=>(tmpl.cats[cat]||[]).forEach(blk=>{blk.include=false;}));
   if(isAdmin){ setCloud(sb?'✓ admin — editing the master options':'local only · add Supabase keys to sync'); return tmpl; }
   const overlay=await loadOverlay();
   setCloud(sb?'✓ your $/kg on the master options':'local only · add Supabase keys to sync');
