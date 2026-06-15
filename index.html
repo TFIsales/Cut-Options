@@ -643,8 +643,8 @@ function render(){
   state.order.forEach(cat=>{
     const b=document.createElement('button');b.className='tab'+(cat===active?' active':'');
     b.innerHTML=`<span>${esc(cat)}</span>${isAdmin?'<span class="ed" title="Rename category">✎</span><span class="x" title="Delete category">✕</span>':''}`;
+    b.onclick=()=>{active=cat;render();};
     const lbl=b.querySelector('span:first-child');
-    lbl.onclick=()=>{active=cat;render();};
     if(isAdmin)lbl.ondblclick=(e)=>{e.stopPropagation();renameCategory(cat);};
     const ed=b.querySelector('.ed');if(ed)ed.onclick=(e)=>{e.stopPropagation();renameCategory(cat);};
     const x=b.querySelector('.x');if(x)x.onclick=(e)=>{e.stopPropagation();if(confirm('Delete category "'+cat+'" and all its primals?')){delete state.cats[cat];state.order=state.order.filter(c=>c!==cat);if(active===cat)active=state.order[0];save();render();}};
