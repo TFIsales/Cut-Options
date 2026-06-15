@@ -315,8 +315,7 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
 .gpl-best-badge{font-size:8.5px;color:var(--muted);margin-top:2px;white-space:nowrap;text-align:center}
 .gpl-grade-tbl .gpl-cat-row td{background:var(--navy);color:#fff;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;padding:5px 12px;position:sticky;left:0}
 .gpl-grade-tbl tr:last-child td{border-bottom:none}
-.gpl-grade-tbl tr:hover td{background:var(--panel)}
-.gpl-grade-tbl tr:hover .gpl-sticky{background:var(--panel)!important}
+.gpl-grade-tbl tbody tr:hover td:not(.gpl-sticky):not(.gpl-extra-col):not(.gpl-cat-row td){background:#f0f4f9}
 /* region sub-tabs */
 .gpl-subtabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:12px}
 .gpl-subtab{background:var(--card);color:var(--muted);border:1px solid var(--line);padding:7px 16px;cursor:pointer;font-size:12px;font-weight:700;border-radius:var(--r-pill);letter-spacing:.2px;box-shadow:var(--shadow);transition:transform .18s var(--ease),background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
