@@ -296,6 +296,21 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
 .gpl-other{text-align:right;color:var(--muted);white-space:nowrap}
 .gpl-other.winner{color:var(--green);font-weight:700}
 .gpl-empty{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px}
+/* weekly head */
+.wh-box{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-md);padding:14px 16px;margin-bottom:18px}
+.wh-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.wh-head h3{margin:0;font-size:14px;font-weight:700;color:var(--navy)}
+.wh-head .wh-sub{font-size:11px;font-weight:500;color:var(--muted);margin-left:8px}
+.wh-total{display:flex;align-items:baseline;gap:8px;background:var(--green-soft);border:1px solid var(--green-line);border-radius:var(--r-md);padding:5px 14px}
+.wh-total span{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--green);font-weight:700}
+.wh-total b{font-size:18px;color:var(--navy);font-weight:700;letter-spacing:-.3px}
+.wh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.wh-cell{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-md);padding:7px 10px}
+.wh-lbl{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.wh-lbl b{font-size:12px;font-weight:700;color:var(--navy2)}
+.wh-lbl i{font-style:normal;font-size:9.5px;color:var(--muted);font-weight:600;letter-spacing:.3px}
+.wh-inp{width:70px;flex-shrink:0}
+.wh-note{margin-top:10px;font-size:11px;color:var(--muted);font-style:italic}
 /* duplicate-cut conflict */
 .card.conflict{border-color:#e67e22;box-shadow:0 0 0 3px rgba(230,126,34,.2),var(--shadow-md)}
 .card.conflict .card-head{background:#fff8ec}
@@ -591,20 +606,60 @@ let isAdmin=false;                       // admin edits the master options; ever
 let searchQuery='';
 let globalPriceListActive=false;
 let globalPrices={};  // { userId: { name, prices: { cutId: price_AUD } } }
+let weeklyHead={};    // { gradeKey: head_count } — shared, admin-edited
 
-/* collect every cut (row) across the full template, deduplicated by id */
+/* ===== full beef cut catalogue (from the master price sheet) ===== */
+const PRICE_SHEET=[
+  {cat:'Hind Quarter',cuts:['Topside','Topside Cap Off','Silverside','Outside','ATS','Eye Round','Knuckle','D-Rump','Rump Cap','Rostbiff']},
+  {cat:'Loins',cuts:['Striploin','Cube Roll','Rib Eye Lip On','Tenderloin','TDR SS/OFF','Butt TDR','Shortloin','OP RIBS','Tomahawk']},
+  {cat:'Forequarter',cuts:['Chuck 5 rib 2 vert','Chuck Roll','CER Neck Off','Chuck Tail Flap','Chuck Roll End','Clod','Oyster','Bolar','Chuck Tender','PE Brisket','PEDO Brisket','DECKLE PCS','Rib Blade','NEB','Shin Shank','TW/SS','Shin Shank Vac','Heel Muscle']},
+  {cat:'Flanks',cuts:['Flap Meat','Flank Steak','ISK','Tri Tip']},
+  {cat:'Ribs',cuts:['Chuck Rib','Short Rib','Chuck Rib B/In','Short Rib B/In','Back Rib','Spare Ribs','Rib Fingers','Rib Eye Cap','Rib End Meat']},
+  {cat:'Chilled Offal',cuts:['Thick Skirt','Thin Skirt','Tongues G1','Cheek']},
+  {cat:'Frozen Offal',cuts:['Head Meat','Cheek','Tails']},
+  {cat:'Red Offal',cuts:['Liver','Spleen','Kidney','Lips','Lungs','Hearts','Tongue Root','Tongue Root Fillet','Weasand','Skirt Membrane']},
+  {cat:'White Offal',cuts:['Small Intestine','Large Intestine','Omasum','Omasum Cap','Whole Tripe','Tripe PCS','Tripe HC','Tripe MC < 500','Tripe MC 500-700','Tripe MC >700','Ligament Nuchae','Tendon','Trachea','Abomasum','Aorta']},
+  {cat:'Bones',cuts:['Neck','Femur','Tibia','Radius','Aitch','Brisket (IN)','Humerus','Patela']}
+];
+/* weekly head (kill schedule) grades from the price sheet */
+const WEEKLY_HEAD_GRADES=[
+  {key:'g1a',code:'G1A',desc:'GF AP Angus'},
+  {key:'d_gs',code:'D1A/D2A/D3A',desc:'GS AP Angus'},
+  {key:'org_yp',code:'',desc:'Organic YP'},
+  {key:'org_s',code:'',desc:'Organic S'},
+  {key:'org_a',code:'',desc:'Organic A'},
+  {key:'d_yp',code:'D1/D2/D3',desc:'YP Grass MSA'},
+  {key:'x_smkt',code:'X/X1/X1A',desc:'S MKT Cattle'},
+  {key:'c_asel',code:'C/C1/C1A',desc:'A Select'},
+  {key:'c_aman',code:'C/C1/C1A',desc:'A Man'},
+  {key:'bull',code:'BULL',desc:'B'}
+];
+function gplId(cat,cut){return 'gpl_'+(cat+'_'+cut).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');}
+
+/* the full cut catalogue used by the Global Price List */
 function getAllCuts(){
-  const cuts=[];const seen=new Set();
-  state.order.forEach(cat=>{
-    (state.cats[cat]||[]).forEach(blk=>{
-      blk.options.forEach(o=>{
-        o.rows.forEach(r=>{
-          if(!seen.has(r.id)){seen.add(r.id);cuts.push({id:r.id,cut:r.cut,primal:blk.title,category:cat});}
-        });
-      });
-    });
-  });
+  const cuts=[];
+  PRICE_SHEET.forEach(g=>g.cuts.forEach(cut=>cuts.push({id:gplId(g.cat,cut),cut:cut,category:g.cat})));
   return cuts;
+}
+
+/* weekly head — shared, stored in cut_template row id='weekly_head' (admin-writable) */
+async function loadWeeklyHead(){
+  if(sb){
+    try{const {data,error}=await sb.from('cut_template').select('data').eq('id','weekly_head').maybeSingle();
+      if(!error&&data&&data.data){weeklyHead=data.data;return;}}catch(e){}
+  }
+  try{const j=localStorage.getItem(LS_KEY+'_weeklyhead');if(j)weeklyHead=JSON.parse(j);}catch(e){}
+}
+let whSaveTimer=null;
+function saveWeeklyHead(){
+  try{localStorage.setItem(LS_KEY+'_weeklyhead',JSON.stringify(weeklyHead));}catch(e){}
+  if(sb&&currentUser&&isAdmin){
+    clearTimeout(whSaveTimer);
+    whSaveTimer=setTimeout(async()=>{
+      try{await sb.from('cut_template').upsert({id:'weekly_head',data:weeklyHead,updated_at:new Date().toISOString()});}catch(e){}
+    },700);
+  }
 }
 
 /* price list — requires a `price_list` table in Supabase:
@@ -800,7 +855,7 @@ function render(){
   const gplTab=document.createElement('button');
   gplTab.className='tab'+(globalPriceListActive?' gpl-tab':' gpl-inactive');
   gplTab.textContent='🌍 Global Price List';
-  gplTab.onclick=async()=>{globalPriceListActive=true;render();await loadPriceList();renderGlobalPriceList();};
+  gplTab.onclick=async()=>{globalPriceListActive=true;render();await loadPriceList();await loadWeeklyHead();renderGlobalPriceList();};
   tabs.appendChild(gplTab);
   // search bar (always shown)
   const sbWrap=document.createElement('div');sbWrap.className='search-bar';
@@ -949,23 +1004,22 @@ function renderGlobalPriceList(){
   const intro=document.createElement('div');intro.className='gpl-intro';
   intro.innerHTML=`<div><h2>Global Price List</h2><p>Enter your best $/kg for each cut. The highest price across all salesmen is highlighted in green.</p></div>`;
   const refBtn=document.createElement('button');refBtn.className='gpl-refresh';refBtn.textContent='↻ Refresh';
-  refBtn.onclick=async()=>{refBtn.textContent='Loading…';await loadPriceList();renderGlobalPriceList();};
+  refBtn.onclick=async()=>{refBtn.textContent='Loading…';await loadPriceList();await loadWeeklyHead();renderGlobalPriceList();};
   intro.appendChild(refBtn);
   wrap.appendChild(intro);
 
-  if(cuts.length===0){
-    const em=document.createElement('div');em.className='gpl-empty';em.textContent='No cuts found — add some primals first.';wrap.appendChild(em);return;
-  }
+  // ----- Weekly Head (kill schedule) section -----
+  renderWeeklyHeadSection(wrap);
 
   const tbl=document.createElement('table');tbl.className='gpl-table';
 
   // thead
   const thead=document.createElement('thead');
   const hrow=document.createElement('tr');
-  const headers=['Cut','Primal','Best $/kg','Best By','Your $/kg',...others.map(([,v])=>v.name)];
+  const headers=['Cut','Best $/kg','Best By','Your $/kg',...others.map(([,v])=>v.name)];
   headers.forEach((h,i)=>{
     const th=document.createElement('th');th.textContent=h;
-    if(i>=2)th.className='num';
+    if(i>=1)th.className='num';
     hrow.appendChild(th);
   });
   thead.appendChild(hrow);tbl.appendChild(thead);
@@ -980,7 +1034,7 @@ function renderGlobalPriceList(){
 
   Object.entries(byCat).forEach(([cat,catCuts])=>{
     const catRow=document.createElement('tr');catRow.className='gpl-cat-row';
-    const catTd=document.createElement('td');catTd.colSpan=5+others.length;catTd.textContent=cat;
+    const catTd=document.createElement('td');catTd.colSpan=4+others.length;catTd.textContent=cat;
     catRow.appendChild(catTd);tbody.appendChild(catRow);
 
     catCuts.forEach(c=>{
@@ -994,7 +1048,6 @@ function renderGlobalPriceList(){
       const row=document.createElement('tr');
 
       const tdCut=document.createElement('td');tdCut.className='gpl-cut';tdCut.textContent=c.cut;row.appendChild(tdCut);
-      const tdPrimal=document.createElement('td');tdPrimal.className='gpl-primal';tdPrimal.textContent=c.primal;row.appendChild(tdPrimal);
 
       const tdBest=document.createElement('td');tdBest.className='gpl-best';
       tdBest.textContent=bestPrice>-Infinity?fmtMoney(bestPrice):'—';row.appendChild(tdBest);
@@ -1029,6 +1082,45 @@ function renderGlobalPriceList(){
     });
   });
   tbl.appendChild(tbody);wrap.appendChild(tbl);
+}
+
+function renderWeeklyHeadSection(wrap){
+  const box=document.createElement('div');box.className='wh-box';
+  const editable=isAdmin;
+  let total=0;WEEKLY_HEAD_GRADES.forEach(g=>{total+=+weeklyHead[g.key]||0;});
+
+  const head=document.createElement('div');head.className='wh-head';
+  head.innerHTML=`<h3>Weekly Head <span class="wh-sub">kill schedule · head per week</span></h3>
+    <div class="wh-total"><span>Total</span><b id="whTotal">${total.toLocaleString()}</b></div>`;
+  box.appendChild(head);
+
+  const grid=document.createElement('div');grid.className='wh-grid';
+  WEEKLY_HEAD_GRADES.forEach(g=>{
+    const cell=document.createElement('div');cell.className='wh-cell';
+    const lbl=document.createElement('div');lbl.className='wh-lbl';
+    lbl.innerHTML=`<b>${esc(g.desc)}</b>${g.code?`<i>${esc(g.code)}</i>`:''}`;
+    cell.appendChild(lbl);
+    const inp=document.createElement('input');
+    inp.type='number';inp.className='n sm wh-inp';inp.step='1';inp.min='0';inp.placeholder='0';
+    inp.value=weeklyHead[g.key]!=null?weeklyHead[g.key]:'';
+    if(editable){
+      inp.oninput=e=>{
+        const v=parseInt(e.target.value,10);
+        if(isNaN(v))delete weeklyHead[g.key];else weeklyHead[g.key]=v;
+        let t=0;WEEKLY_HEAD_GRADES.forEach(x=>{t+=+weeklyHead[x.key]||0;});
+        const tEl=document.getElementById('whTotal');if(tEl)tEl.textContent=t.toLocaleString();
+        saveWeeklyHead();
+      };
+    }else{inp.readOnly=true;}
+    cell.appendChild(inp);
+    grid.appendChild(cell);
+  });
+  box.appendChild(grid);
+  if(!editable){
+    const note=document.createElement('div');note.className='wh-note';note.textContent='Weekly head figures are maintained by an admin.';
+    box.appendChild(note);
+  }
+  wrap.appendChild(box);
 }
 
 function solveBE(blk,oi,row,inp){
@@ -1226,7 +1318,7 @@ function applyRole(){
 async function startApp(){
   state=await loadInitial();active=state.order[0];carcInp.value=state.carcase;
   syncCurrencyUI();render();
-  loadPriceList();
+  loadPriceList();loadWeeklyHead();
   if(isAdmin&&sb&&currentUser)save();
 }
 
