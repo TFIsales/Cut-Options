@@ -296,6 +296,27 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
 .gpl-other{text-align:right;color:var(--muted);white-space:nowrap}
 .gpl-other.winner{color:var(--green);font-weight:700}
 .gpl-empty{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px}
+/* grade-column table */
+.gpl-scroll{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--line);box-shadow:var(--shadow-md);margin-bottom:20px}
+.gpl-grade-tbl{min-width:max-content;border-collapse:collapse;font-size:12px;background:var(--card)}
+.gpl-grade-tbl th,.gpl-grade-tbl td{padding:5px 8px;border-bottom:1px solid var(--line2);border-right:1px solid var(--line2);vertical-align:middle;white-space:nowrap}
+.gpl-grade-tbl th{background:var(--panel);font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700;text-align:center;border-bottom:2px solid var(--line)}
+.gpl-marble-row th{background:var(--navy);color:#fff;font-size:9px;letter-spacing:.5px;text-align:center;border-right:1px solid rgba(255,255,255,.15)}
+.gpl-marble{background:linear-gradient(180deg,#163c66,var(--navy))}
+.gpl-grade-th{background:var(--panel2)!important;min-width:82px}
+.gpl-grade-th span{display:block;font-size:9px;font-weight:700;color:var(--navy2)}
+.gpl-grade-th i{display:block;font-style:normal;font-size:8px;color:var(--muted);font-weight:600;margin-top:1px}
+.gpl-sticky{position:sticky;left:0;z-index:2;background:var(--card)!important;border-right:2px solid var(--line)!important;min-width:140px;max-width:200px;white-space:normal;font-weight:600;color:var(--navy2)}
+.gpl-grade-tbl thead th.gpl-sticky{background:var(--navy)!important;color:#fff;z-index:3}
+.gpl-extra-col{min-width:90px;background:var(--panel)!important;border-right:2px solid var(--line)!important}
+.gpl-grade-cell{padding:4px 6px!important;text-align:center}
+.gpl-grade-inp{width:66px;padding:3px 5px;font-size:11.5px;text-align:right}
+.gpl-winner-inp{border-color:var(--green)!important;background:var(--green-soft)!important;color:var(--green)!important;font-weight:700}
+.gpl-best-badge{font-size:8.5px;color:var(--muted);margin-top:2px;white-space:nowrap;text-align:center}
+.gpl-grade-tbl .gpl-cat-row td{background:var(--navy);color:#fff;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;padding:5px 12px;position:sticky;left:0}
+.gpl-grade-tbl tr:last-child td{border-bottom:none}
+.gpl-grade-tbl tr:hover td{background:var(--panel)}
+.gpl-grade-tbl tr:hover .gpl-sticky{background:var(--panel)!important}
 /* region sub-tabs */
 .gpl-subtabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:12px}
 .gpl-subtab{background:var(--card);color:var(--muted);border:1px solid var(--line);padding:7px 16px;cursor:pointer;font-size:12px;font-weight:700;border-radius:var(--r-pill);letter-spacing:.2px;box-shadow:var(--shadow);transition:transform .18s var(--ease),background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
@@ -306,20 +327,21 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
 .gpl-subtab.master:hover{background:var(--green-soft)}
 .gpl-subtab.master.active{background:linear-gradient(180deg,#1a5f3c,var(--green));color:#fff;border-color:var(--green);box-shadow:0 4px 14px rgba(46,139,70,.28)}
 /* weekly head */
-.wh-box{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-md);padding:14px 16px;margin-bottom:18px}
-.wh-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-.wh-head h3{margin:0;font-size:14px;font-weight:700;color:var(--navy)}
-.wh-head .wh-sub{font-size:11px;font-weight:500;color:var(--muted);margin-left:8px}
-.wh-total{display:flex;align-items:baseline;gap:8px;background:var(--green-soft);border:1px solid var(--green-line);border-radius:var(--r-md);padding:5px 14px}
-.wh-total span{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--green);font-weight:700}
-.wh-total b{font-size:18px;color:var(--navy);font-weight:700;letter-spacing:-.3px}
-.wh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
-.wh-cell{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-md);padding:7px 10px}
-.wh-lbl{display:flex;flex-direction:column;line-height:1.25;min-width:0}
-.wh-lbl b{font-size:12px;font-weight:700;color:var(--navy2)}
-.wh-lbl i{font-style:normal;font-size:9.5px;color:var(--muted);font-weight:600;letter-spacing:.3px}
-.wh-inp{width:70px;flex-shrink:0}
-.wh-note{margin-top:10px;font-size:11px;color:var(--muted);font-style:italic}
+.wh-box{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-md);padding:12px 14px;margin-bottom:16px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.wh-head{display:flex;flex-direction:column;gap:6px;min-width:120px}
+.wh-head h3{margin:0;font-size:13px;font-weight:700;color:var(--navy)}
+.wh-head .wh-sub{font-size:10px;font-weight:500;color:var(--muted)}
+.wh-total{display:flex;align-items:baseline;gap:6px;background:var(--green-soft);border:1px solid var(--green-line);border-radius:var(--r-md);padding:4px 10px}
+.wh-total span{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--green);font-weight:700}
+.wh-total b{font-size:16px;color:var(--navy);font-weight:700;letter-spacing:-.3px}
+.wh-grid{display:flex;flex-direction:column;gap:2px;flex:1 1 auto}
+.wh-cell{display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--line2)}
+.wh-cell:last-child{border-bottom:none}
+.wh-lbl{display:flex;align-items:baseline;gap:6px;flex:1 1 auto;min-width:0}
+.wh-lbl b{font-size:12px;font-weight:600;color:var(--navy2)}
+.wh-lbl i{font-style:normal;font-size:9.5px;color:var(--muted);font-weight:600;letter-spacing:.2px}
+.wh-inp{width:68px;flex-shrink:0;text-align:right}
+.wh-note{font-size:11px;color:var(--muted);font-style:italic;align-self:flex-end}
 /* duplicate-cut conflict */
 .card.conflict{border-color:#e67e22;box-shadow:0 0 0 3px rgba(230,126,34,.2),var(--shadow-md)}
 .card.conflict .card-head{background:#fff8ec}
@@ -618,6 +640,36 @@ let globalPrices={};  // { userId: { name, prices: { region: { cutId: price_AUD 
 let weeklyHead={};    // { gradeKey: head_count } — shared, admin-edited
 const REGIONS=['Japan','China','USA','SEA','MENA','PNG','Domestic','Europe'];
 let gplRegion='master';  // which Global Price List sub-tab: 'master' or a region name
+
+/* 16 grade/marbling columns from the master price sheet */
+const GRADES=[
+  {key:'a_grade',     label:'A Grade',          marbling:'0'},
+  {key:'a_select',    label:'A Select',          marbling:'0'},
+  {key:'s_grade',     label:'S Grade',           marbling:'0'},
+  {key:'yp_grade',    label:'YP Grade',          marbling:'0'},
+  {key:'yp_grass',    label:'YP Grass MSA',      marbling:'0',   sub:'White Classic'},
+  {key:'organic',     label:'Organic',           marbling:'0'},
+  {key:'org_ox',      label:'Organic OX',        marbling:'0'},
+  {key:'yp_organic',  label:'YP Organic',        marbling:'0'},
+  {key:'wc_grain',    label:'White Classic',     marbling:'0-1', sub:'Grain'},
+  {key:'supreme',     label:'Supreme',           marbling:'2+',  sub:'Grain'},
+  {key:'signature',   label:'Signature',         marbling:'4+',  sub:'Grain'},
+  {key:'ag_grass_01', label:'Angus Pure Grass',  marbling:'0-1'},
+  {key:'ag_grass_2p', label:'Angus Pure Grass',  marbling:'2+'},
+  {key:'ag_grain_01', label:'Angus Pure Grain',  marbling:'0-1'},
+  {key:'ag_grain_2p', label:'Angus Pure Grain',  marbling:'2+'},
+  {key:'ag_grain_4p', label:'Angus Pure Grain',  marbling:'4+'},
+];
+function gpKey(cutId,gradeKey){return cutId+'__'+gradeKey;}
+/* best price for a specific cut+grade in a region across all salesmen */
+function bestForGrade(cutId,gradeKey,region){
+  let best=-Infinity,name='—';
+  Object.values(globalPrices).forEach(s=>{
+    const p=parseFloat(((s.prices||{})[region]||{})[gpKey(cutId,gradeKey)]);
+    if(!isNaN(p)&&p>best){best=p;name=s.name;}
+  });
+  return {best,name};
+}
 
 /* ===== full beef cut catalogue (from the master price sheet) ===== */
 const PRICE_SHEET=[
@@ -1003,14 +1055,6 @@ function optEl(blk,o,oi){
 }
 
 /* best price for a cut within one region (across all salesmen) */
-function bestInRegion(cutId,region){
-  let best=-Infinity,name='—';
-  Object.values(globalPrices).forEach(s=>{
-    const p=parseFloat(((s.prices||{})[region]||{})[cutId]);
-    if(!isNaN(p)&&p>best){best=p;name=s.name;}
-  });
-  return {best,name};
-}
 
 function renderGlobalPriceList(){
   const wrap=document.getElementById('wrap');wrap.innerHTML='';
@@ -1047,112 +1091,144 @@ function renderGlobalPriceList(){
   }
 }
 
-/* MASTER: best price per cut across all regions, with a column per region */
+/* ---- shared table builder ---- */
+function makeGradeTableScroller(){
+  const outer=document.createElement('div');outer.className='gpl-scroll';
+  const tbl=document.createElement('table');tbl.className='gpl-table gpl-grade-tbl';
+  outer.appendChild(tbl);return {outer,tbl};
+}
+
+function buildGradeHead(tbl,extraCols){
+  // row 1: marbling values spanning grades
+  const thead=document.createElement('thead');
+  const mr=document.createElement('tr');mr.className='gpl-marble-row';
+  const thCut=document.createElement('th');thCut.rowSpan=2;thCut.className='gpl-sticky';thCut.textContent='Cut';mr.appendChild(thCut);
+  extraCols.forEach(ec=>{const th=document.createElement('th');th.rowSpan=2;th.className='num gpl-extra-col';th.innerHTML=ec;mr.appendChild(th);});
+  // group marbling headers
+  const mGroups=[];
+  GRADES.forEach(g=>{
+    const last=mGroups[mGroups.length-1];
+    if(last&&last.m===g.marbling)last.n++;
+    else mGroups.push({m:g.marbling,n:1});
+  });
+  mGroups.forEach(mg=>{const th=document.createElement('th');th.colSpan=mg.n;th.className='num gpl-marble';th.textContent=mg.m?'◆ '+mg.m:'—';mr.appendChild(th);});
+  thead.appendChild(mr);
+  // row 2: grade names
+  const gr=document.createElement('tr');gr.className='gpl-grade-row';
+  GRADES.forEach(g=>{
+    const th=document.createElement('th');th.className='num gpl-grade-th';
+    th.innerHTML=`<span>${esc(g.label)}</span>${g.sub?`<i>${esc(g.sub)}</i>`:''}`;
+    gr.appendChild(th);
+  });
+  thead.appendChild(gr);
+  tbl.appendChild(thead);
+  return tbl;
+}
+
+/* MASTER: one row per cut, columns = grades, cells = best across all regions */
 function renderMasterTable(wrap){
   const cuts=getAllCuts();
-  const tbl=document.createElement('table');tbl.className='gpl-table';
-  const thead=document.createElement('thead');const hrow=document.createElement('tr');
-  ['Cut','Best $/kg','Best Region','Best By',...REGIONS].forEach((h,i)=>{
-    const th=document.createElement('th');th.textContent=h;if(i>=1)th.className='num';hrow.appendChild(th);
-  });
-  thead.appendChild(hrow);tbl.appendChild(thead);
+  const {outer,tbl}=makeGradeTableScroller();
+  buildGradeHead(tbl,['Best $/kg','Best Grade','Best Region','Best By']);
 
   const tbody=document.createElement('tbody');
   const byCat={};cuts.forEach(c=>{(byCat[c.category]=byCat[c.category]||[]).push(c);});
+
   Object.entries(byCat).forEach(([cat,catCuts])=>{
     const catRow=document.createElement('tr');catRow.className='gpl-cat-row';
-    const catTd=document.createElement('td');catTd.colSpan=4+REGIONS.length;catTd.textContent=cat;
+    const catTd=document.createElement('td');catTd.colSpan=5+GRADES.length;catTd.textContent=cat;
     catRow.appendChild(catTd);tbody.appendChild(catRow);
 
     catCuts.forEach(c=>{
-      const perReg={};let overall=-Infinity,bestReg='—',bestName='—';
-      REGIONS.forEach(r=>{
-        const br=bestInRegion(c.id,r);perReg[r]=br;
-        if(br.best>overall){overall=br.best;bestReg=r;bestName=br.name;}
+      // find global best across all grades × regions
+      let overall=-Infinity,bestGrade='—',bestReg='—',bestBy='—';
+      GRADES.forEach(g=>{
+        REGIONS.forEach(r=>{
+          const b=bestForGrade(c.id,g.key,r);
+          if(b.best>overall){overall=b.best;bestGrade=g.label+(g.sub?' '+g.sub:'');bestReg=r;bestBy=b.name;}
+        });
       });
       const row=document.createElement('tr');
-      const tdCut=document.createElement('td');tdCut.className='gpl-cut';tdCut.textContent=c.cut;row.appendChild(tdCut);
-      const tdBest=document.createElement('td');tdBest.className='gpl-best';tdBest.textContent=overall>-Infinity?fmtMoney(overall):'—';row.appendChild(tdBest);
-      const tdReg=document.createElement('td');tdReg.className='gpl-bestby';tdReg.textContent=overall>-Infinity?bestReg:'—';row.appendChild(tdReg);
-      const tdBy=document.createElement('td');tdBy.className='gpl-bestby';tdBy.textContent=bestName;row.appendChild(tdBy);
-      REGIONS.forEach(r=>{
+      const tdCut=document.createElement('td');tdCut.className='gpl-cut gpl-sticky';tdCut.textContent=c.cut;row.appendChild(tdCut);
+      // extra summary cols
+      [[fmtMoney(overall),'gpl-best'],[bestGrade,'gpl-bestby'],[bestReg,'gpl-bestby'],[bestBy,'gpl-bestby']].forEach(([v,cls])=>{
+        const td=document.createElement('td');td.className=cls+' gpl-extra-col';td.textContent=overall>-Infinity?v:'—';row.appendChild(td);
+      });
+      // grade columns — best across all regions for this cut+grade
+      GRADES.forEach(g=>{
+        let gBest=-Infinity;
+        REGIONS.forEach(r=>{const b=bestForGrade(c.id,g.key,r);if(b.best>gBest)gBest=b.best;});
         const td=document.createElement('td');
-        const v=perReg[r].best;
-        const isWin=v>-Infinity&&Math.abs(v-overall)<0.0001;
+        const isWin=gBest>-Infinity&&Math.abs(gBest-overall)<0.0001;
         td.className='gpl-other'+(isWin?' winner':'');
-        td.textContent=v>-Infinity?fmtMoney(v):'—';
+        td.textContent=gBest>-Infinity?fmtMoney(gBest):'—';
         row.appendChild(td);
       });
       tbody.appendChild(row);
     });
   });
-  tbl.appendChild(tbody);wrap.appendChild(tbl);
+  tbl.appendChild(tbody);
+  outer.appendChild(tbl);
+  wrap.appendChild(outer);
 }
 
-/* REGION: per-salesman price entry for one region */
+/* REGION: one row per cut, grade columns = your editable price + best-by badge */
 function renderRegionTable(wrap,region){
   const cuts=getAllCuts();
   const uid=currentUser?.id||'local';
   const myPrices=Object.assign({},((globalPrices[uid]||{}).prices||{})[region]||{});
-  const others=Object.entries(globalPrices).filter(([id])=>id!==uid);
-  const allIds=Object.keys(globalPrices);
-
-  const tbl=document.createElement('table');tbl.className='gpl-table';
-  const thead=document.createElement('thead');const hrow=document.createElement('tr');
-  ['Cut','Best $/kg','Best By','Your $/kg',...others.map(([,v])=>v.name)].forEach((h,i)=>{
-    const th=document.createElement('th');th.textContent=h;if(i>=1)th.className='num';hrow.appendChild(th);
-  });
-  thead.appendChild(hrow);tbl.appendChild(thead);
-
-  const tbody=document.createElement('tbody');
   const pending=Object.assign({},myPrices);
   let saveHandle=null;
+
+  const {outer,tbl}=makeGradeTableScroller();
+  buildGradeHead(tbl,[]);
+
+  const tbody=document.createElement('tbody');
   const byCat={};cuts.forEach(c=>{(byCat[c.category]=byCat[c.category]||[]).push(c);});
+
   Object.entries(byCat).forEach(([cat,catCuts])=>{
     const catRow=document.createElement('tr');catRow.className='gpl-cat-row';
-    const catTd=document.createElement('td');catTd.colSpan=4+others.length;catTd.textContent=cat;
+    const catTd=document.createElement('td');catTd.colSpan=1+GRADES.length;catTd.textContent=cat;
     catRow.appendChild(catTd);tbody.appendChild(catRow);
 
     catCuts.forEach(c=>{
-      let bestPrice=-Infinity,bestName='—';
-      allIds.forEach(sid=>{
-        const p=parseFloat(((globalPrices[sid]?.prices||{})[region]||{})[c.id]);
-        if(!isNaN(p)&&p>bestPrice){bestPrice=p;bestName=globalPrices[sid].name;}
-      });
       const row=document.createElement('tr');
-      const tdCut=document.createElement('td');tdCut.className='gpl-cut';tdCut.textContent=c.cut;row.appendChild(tdCut);
-      const tdBest=document.createElement('td');tdBest.className='gpl-best';tdBest.textContent=bestPrice>-Infinity?fmtMoney(bestPrice):'—';row.appendChild(tdBest);
-      const tdBy=document.createElement('td');tdBy.className='gpl-bestby';tdBy.textContent=bestName;row.appendChild(tdBy);
+      const tdCut=document.createElement('td');tdCut.className='gpl-cut gpl-sticky';tdCut.textContent=c.cut;row.appendChild(tdCut);
 
-      const tdMine=document.createElement('td');tdMine.className='gpl-mine';
-      const inp=document.createElement('input');
-      inp.type='number';inp.className='n sm';inp.step='0.01';inp.placeholder='—';
-      const myRaw=myPrices[c.id];
-      inp.value=myRaw!=null?(state.displayCurrency==='USD'?(myRaw*(+state.fxRate||0.64)).toFixed(2):myRaw):'';
-      inp.oninput=e=>{
-        const v=parseFloat(e.target.value);
-        if(isNaN(v)||e.target.value.trim()==='')delete pending[c.id];
-        else pending[c.id]=state.displayCurrency==='USD'?v/(+state.fxRate||0.64):v;
-        clearTimeout(saveHandle);saveHandle=setTimeout(()=>{
-          const full=Object.assign({},(globalPrices[uid]||{}).prices||{});
-          full[region]=Object.assign({},pending);
-          saveMyPriceList(full);
-        },800);
-      };
-      tdMine.appendChild(inp);row.appendChild(tdMine);
-
-      others.forEach(([sid,sv])=>{
-        const td=document.createElement('td');
-        const p=((sv.prices||{})[region]||{})[c.id];
-        const isWin=p!=null&&bestPrice>-Infinity&&Math.abs(+p-bestPrice)<0.0001;
-        td.className='gpl-other'+(isWin?' winner':'');
-        td.textContent=p!=null?fmtMoney(+p):'—';
+      GRADES.forEach(g=>{
+        const k=gpKey(c.id,g.key);
+        const br=bestForGrade(c.id,g.key,region);
+        const myRaw=myPrices[k];
+        const td=document.createElement('td');td.className='gpl-grade-cell';
+        const inp=document.createElement('input');
+        inp.type='number';inp.className='n sm gpl-grade-inp';inp.step='0.01';inp.placeholder='—';
+        inp.value=myRaw!=null?(state.displayCurrency==='USD'?(myRaw*(+state.fxRate||0.64)).toFixed(2):myRaw):'';
+        const amIBest=myRaw!=null&&br.best>-Infinity&&Math.abs(myRaw-br.best)<0.0001;
+        if(amIBest)inp.classList.add('gpl-winner-inp');
+        inp.oninput=e=>{
+          const v=parseFloat(e.target.value);
+          if(isNaN(v)||e.target.value.trim()==='')delete pending[k];
+          else pending[k]=state.displayCurrency==='USD'?v/(+state.fxRate||0.64):v;
+          clearTimeout(saveHandle);saveHandle=setTimeout(()=>{
+            const full=Object.assign({},(globalPrices[uid]||{}).prices||{});
+            full[region]=Object.assign({},pending);
+            saveMyPriceList(full);
+          },800);
+        };
+        td.appendChild(inp);
+        if(br.best>-Infinity){
+          const badge=document.createElement('div');badge.className='gpl-best-badge';
+          badge.textContent='↑ '+fmtMoney(br.best)+' ('+br.name+')';
+          td.appendChild(badge);
+        }
         row.appendChild(td);
       });
       tbody.appendChild(row);
     });
   });
-  tbl.appendChild(tbody);wrap.appendChild(tbl);
+  tbl.appendChild(tbody);
+  outer.appendChild(tbl);
+  wrap.appendChild(outer);
 }
 
 function renderWeeklyHeadSection(wrap){
