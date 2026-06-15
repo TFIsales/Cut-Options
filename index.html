@@ -304,9 +304,11 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
 .gpl-grade-th{min-width:82px;vertical-align:top!important}
 .gpl-grade-th span{display:block;font-size:9px;font-weight:700;color:#fff}
 .gpl-grade-th i{display:block;font-style:normal;font-size:8px;color:rgba(255,255,255,.55);font-weight:500;margin-top:1px}
-.gpl-sticky{position:sticky;left:0;z-index:2;background:var(--card)!important;border-right:2px solid rgba(0,0,0,.12)!important;min-width:140px;max-width:200px;white-space:normal;font-weight:600;color:var(--navy2)}
+.gpl-sticky{position:sticky;left:0;z-index:2;background:var(--card)!important;border-right:2px solid var(--line)!important;min-width:140px;max-width:200px;white-space:normal;font-weight:600;color:var(--navy2)}
 .gpl-grade-tbl thead th.gpl-sticky{background:var(--navy)!important;color:#fff;z-index:3;text-align:left}
-.gpl-extra-col{min-width:90px;background:rgba(255,255,255,.06)!important;text-align:center!important;border-right:1px solid rgba(255,255,255,.15)!important}
+.gpl-extra-col{min-width:90px;text-align:right!important}
+.gpl-grade-tbl thead th.gpl-extra-col{background:rgba(255,255,255,.08)!important;color:#fff;border-right:1px solid rgba(255,255,255,.15)!important}
+.gpl-grade-tbl tbody td.gpl-extra-col{background:var(--panel)!important;border-right:2px solid var(--line)!important;color:var(--ink)}
 .gpl-grade-cell{padding:4px 6px!important;text-align:center}
 .gpl-grade-inp{width:66px;padding:3px 5px;font-size:11.5px;text-align:right}
 .gpl-winner-inp{border-color:var(--green)!important;background:var(--green-soft)!important;color:var(--green)!important;font-weight:700}
@@ -324,22 +326,19 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
 .gpl-subtab.master{color:var(--green);border-color:var(--green-line)}
 .gpl-subtab.master:hover{background:var(--green-soft)}
 .gpl-subtab.master.active{background:linear-gradient(180deg,#1a5f3c,var(--green));color:#fff;border-color:var(--green);box-shadow:0 4px 14px rgba(46,139,70,.28)}
-/* weekly head */
-.wh-box{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-md);padding:12px 14px;margin-bottom:16px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
-.wh-head{display:flex;flex-direction:column;gap:6px;min-width:120px}
-.wh-head h3{margin:0;font-size:13px;font-weight:700;color:var(--navy)}
-.wh-head .wh-sub{font-size:10px;font-weight:500;color:var(--muted)}
-.wh-total{display:flex;align-items:baseline;gap:6px;background:var(--green-soft);border:1px solid var(--green-line);border-radius:var(--r-md);padding:4px 10px}
-.wh-total span{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--green);font-weight:700}
-.wh-total b{font-size:16px;color:var(--navy);font-weight:700;letter-spacing:-.3px}
-.wh-grid{display:flex;flex-direction:column;gap:2px;flex:1 1 auto}
-.wh-cell{display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--line2)}
-.wh-cell:last-child{border-bottom:none}
-.wh-lbl{display:flex;align-items:baseline;gap:6px;flex:1 1 auto;min-width:0}
-.wh-lbl b{font-size:12px;font-weight:600;color:var(--navy2)}
-.wh-lbl i{font-style:normal;font-size:9.5px;color:var(--muted);font-weight:600;letter-spacing:.2px}
-.wh-inp{width:68px;flex-shrink:0;text-align:right}
-.wh-note{font-size:11px;color:var(--muted);font-style:italic;align-self:flex-end}
+/* weekly head — compact */
+.wh-box{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-md);padding:10px 14px;margin-bottom:14px;display:inline-flex;gap:16px;align-items:flex-start}
+.wh-head{display:flex;flex-direction:column;gap:4px;min-width:90px}
+.wh-head h3{margin:0;font-size:12px;font-weight:700;color:var(--navy);white-space:nowrap}
+.wh-total{display:flex;align-items:baseline;gap:4px}
+.wh-total span{font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:700}
+.wh-total b{font-size:14px;color:var(--green);font-weight:700}
+.wh-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+.wh-cell{display:flex;align-items:center;gap:6px;padding:2px 0;border-bottom:1px solid var(--line2)}
+.wh-cell:last-child,.wh-cell:nth-last-child(2):nth-child(odd){border-bottom:none}
+.wh-lbl{font-size:11px;font-weight:600;color:var(--navy2);white-space:nowrap;flex:1}
+.wh-inp{width:56px;flex-shrink:0;text-align:right;font-size:12px}
+.wh-note{font-size:10px;color:var(--muted);font-style:italic;margin-top:4px;grid-column:1/-1}
 /* duplicate-cut conflict */
 .card.conflict{border-color:#e67e22;box-shadow:0 0 0 3px rgba(230,126,34,.2),var(--shadow-md)}
 .card.conflict .card-head{background:#fff8ec}
@@ -1118,29 +1117,29 @@ function buildGradeHead(tbl,extraCols){
 function renderMasterTable(wrap){
   const cuts=getAllCuts();
   const {outer,tbl}=makeGradeTableScroller();
-  buildGradeHead(tbl,['Best $/kg','Best Grade','Best Region','Best By']);
+  buildGradeHead(tbl,['Best $/kg','Best Region','Best By']);
 
   const tbody=document.createElement('tbody');
   const byCat={};cuts.forEach(c=>{(byCat[c.category]=byCat[c.category]||[]).push(c);});
 
   Object.entries(byCat).forEach(([cat,catCuts])=>{
     const catRow=document.createElement('tr');catRow.className='gpl-cat-row';
-    const catTd=document.createElement('td');catTd.colSpan=5+GRADES.length;catTd.textContent=cat;
+    const catTd=document.createElement('td');catTd.colSpan=4+GRADES.length;catTd.textContent=cat;
     catRow.appendChild(catTd);tbody.appendChild(catRow);
 
     catCuts.forEach(c=>{
       // find global best across all grades × regions
-      let overall=-Infinity,bestGrade='—',bestReg='—',bestBy='—';
+      let overall=-Infinity,bestReg='—',bestBy='—';
       GRADES.forEach(g=>{
         REGIONS.forEach(r=>{
           const b=bestForGrade(c.id,g.key,r);
-          if(b.best>overall){overall=b.best;bestGrade=g.label+(g.sub?' '+g.sub:'');bestReg=r;bestBy=b.name;}
+          if(b.best>overall){overall=b.best;bestReg=r;bestBy=b.name;}
         });
       });
       const row=document.createElement('tr');
       const tdCut=document.createElement('td');tdCut.className='gpl-cut gpl-sticky';tdCut.textContent=c.cut;row.appendChild(tdCut);
       // extra summary cols
-      [[fmtMoney(overall),'gpl-best'],[bestGrade,'gpl-bestby'],[bestReg,'gpl-bestby'],[bestBy,'gpl-bestby']].forEach(([v,cls])=>{
+      [[fmtMoney(overall),'gpl-best'],[bestReg,'gpl-bestby'],[bestBy,'gpl-bestby']].forEach(([v,cls])=>{
         const td=document.createElement('td');td.className=cls+' gpl-extra-col';td.textContent=overall>-Infinity?v:'—';row.appendChild(td);
       });
       // grade columns — best across all regions for this cut+grade
@@ -1226,15 +1225,14 @@ function renderWeeklyHeadSection(wrap){
   let total=0;WEEKLY_HEAD_GRADES.forEach(g=>{total+=+weeklyHead[g.key]||0;});
 
   const head=document.createElement('div');head.className='wh-head';
-  head.innerHTML=`<h3>Weekly Head <span class="wh-sub">kill schedule · head per week</span></h3>
-    <div class="wh-total"><span>Total</span><b id="whTotal">${total.toLocaleString()}</b></div>`;
+  head.innerHTML=`<h3>Weekly Head</h3><div class="wh-total"><span>Total</span><b id="whTotal">${total.toLocaleString()}</b></div>`;
   box.appendChild(head);
 
   const grid=document.createElement('div');grid.className='wh-grid';
   WEEKLY_HEAD_GRADES.forEach(g=>{
     const cell=document.createElement('div');cell.className='wh-cell';
     const lbl=document.createElement('div');lbl.className='wh-lbl';
-    lbl.innerHTML=`<b>${esc(g.desc)}</b>${g.code?`<i>${esc(g.code)}</i>`:''}`;
+    lbl.textContent=g.desc+(g.code?' ('+g.code+')':'');
     cell.appendChild(lbl);
     const inp=document.createElement('input');
     inp.type='number';inp.className='n sm wh-inp';inp.step='1';inp.min='0';inp.placeholder='0';
