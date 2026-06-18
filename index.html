@@ -921,10 +921,16 @@ function render(){
   const sbWrap=document.createElement('div');sbWrap.className='search-bar';
   const sbInp=document.createElement('input');
   sbInp.type='search';sbInp.className='search-inp';sbInp.placeholder='Search primals & cuts…';sbInp.value=searchQuery;
-  sbInp.oninput=e=>{searchQuery=e.target.value;render();};
+  sbInp.oninput=e=>{searchQuery=e.target.value;renderWrap();};
   sbWrap.appendChild(sbInp);
   tabs.appendChild(sbWrap);
+  // focus restored after tab rebuild
+  if(searchQuery)setTimeout(()=>{const el=document.querySelector('.search-inp');if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}},0);
 
+  renderWrap();
+}
+
+function renderWrap(){
   const wrap=document.getElementById('wrap');wrap.innerHTML='';
   wrap.className='wrap';wrap.style.maxWidth='';
   if(!active){active=state.order[0];}
