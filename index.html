@@ -874,7 +874,7 @@ async function loadInitial(){
 /* ---------- calc ---------- */
 const carc=()=>parseFloat(state.carcase)||0;
 function rowVal(blk,r){return blk.mode==='kg'? r.price*r.q : r.price*r.q*carc();}
-function labourVal(blk,r){return blk.mode==='kg'? r.labour*r.q : r.labour*r.q*carc();}
+function labourVal(blk,r){return r.labour;}
 function optNet(blk,o){let v=0;o.rows.forEach(r=>{v+=rowVal(blk,r)-labourVal(blk,r)});return v;}
 function rowWeight(blk,r){return blk.mode==='kg'?(+r.q||0):(+r.q||0)*carc();}
 /* currency display helpers — all internal values are AUD; fx converts for display only */
@@ -1038,7 +1038,7 @@ function optEl(blk,o,oi){
       <div class="cflds">
         <label class="fld"><i>${state.displayCurrency==='USD'?'$/kg USD':'$/kg AUD'}</i><span class="pwrap"><input class="n sm" type="number" step="0.01" value="${state.displayCurrency==='USD'?(r.price*(+state.fxRate||0.64)).toFixed(2):r.price}" data-f="price"><button class="be" title="Break-even ⌖ — solve the $/kg (${state.displayCurrency}) this cut needs for boning to match leaving the primal whole">⌖</button></span></label>
         <label class="fld"><i>${qlab}</i><input class="n sm" type="number" step="0.001" value="${qShown}" data-f="q" ${ro}></label>
-        <label class="fld"><i>extra boning/packing $/kg</i><input class="n sm" type="number" step="0.01" value="${state.displayCurrency==='USD'?(r.labour*(+state.fxRate||0.64)).toFixed(2):r.labour}" data-f="labour"></label>
+        <label class="fld"><i>labour $/hd</i><input class="n sm" type="number" step="0.01" value="${state.displayCurrency==='USD'?(r.labour*(+state.fxRate||0.64)).toFixed(2):r.labour}" data-f="labour"></label>
         <span class="fld out"><i>est. kg</i><span class="rv" data-rowwt="${r.id}">–</span></span>
         <span class="fld out"><i>$/hd</i><span class="rv dollar" data-rowval="${r.id}">–</span></span>
         ${isAdmin?'<button class="rowdel" title="Delete cut">✕</button>':''}
@@ -1269,7 +1269,7 @@ function solveBE(blk,oi,row,inp){
   o.rows.forEach(r=>{if(r!==row)other+=rowVal(blk,r)-labourVal(blk,r);});
   const f=isKg?row.q:row.q*carc();
   if(f<=0){alert('This cut has 0 yield/weight — set that first, then ⌖ can solve a price.');return;}
-  const req=(T-other)/f+row.labour;
+  const req=(T-other+row.labour)/f;
   row.price=+req.toFixed(2);
   inp.value=state.displayCurrency==='USD'?(req*(+state.fxRate||0.64)).toFixed(2):row.price;
   inp.classList.remove('flash');void inp.offsetWidth;inp.classList.add('flash');
