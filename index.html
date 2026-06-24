@@ -293,8 +293,7 @@ input.n[readonly]:hover{border-color:var(--line2);box-shadow:none}
 .gpl-best{font-weight:700;color:var(--green);text-align:right;white-space:nowrap}
 .gpl-bestby{font-weight:600;color:var(--navy);font-size:11.5px}
 .gpl-mine input{width:72px;text-align:right}
-.gpl-other{text-align:right;color:var(--muted);white-space:nowrap}
-.gpl-other.winner{color:var(--green);font-weight:700}
+.gpl-master-price{font-weight:700;color:var(--navy);white-space:nowrap;text-align:center}
 .gpl-empty{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px}
 /* grade-column table */
 .gpl-scroll{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--line);box-shadow:var(--shadow-md);margin-bottom:20px;width:100%}
@@ -665,6 +664,12 @@ function bestForGrade(cutId,gradeKey,region){
     if(!isNaN(p)&&p>best){best=p;name=s.name;}
   });
   return {best,name};
+}
+/* best price for a specific cut+grade across ALL regions, returns region too */
+function bestAcrossRegions(cutId,gradeKey){
+  let best=-Infinity,region='—',name='—';
+  REGIONS.forEach(r=>{const b=bestForGrade(cutId,gradeKey,r);if(b.best>best){best=b.best;region=r;name=b.name;}});
+  return {best,region,name};
 }
 
 /* ===== full beef cut catalogue (from the master price sheet) ===== */
@@ -1124,39 +1129,30 @@ function buildGradeHead(tbl,extraCols){
 function renderMasterTable(wrap){
   const cuts=getAllCuts();
   const {outer,tbl}=makeGradeTableScroller();
-  buildGradeHead(tbl,['Best $/kg','Best Region','Best By']);
+  buildGradeHead(tbl,[]);
 
   const tbody=document.createElement('tbody');
   const byCat={};cuts.forEach(c=>{(byCat[c.category]=byCat[c.category]||[]).push(c);});
 
   Object.entries(byCat).forEach(([cat,catCuts])=>{
     const catRow=document.createElement('tr');catRow.className='gpl-cat-row';
-    const catTd=document.createElement('td');catTd.colSpan=4+GRADES.length;catTd.textContent=cat;
+    const catTd=document.createElement('td');catTd.colSpan=1+GRADES.length;catTd.textContent=cat;
     catRow.appendChild(catTd);tbody.appendChild(catRow);
 
     catCuts.forEach(c=>{
-      // find global best across all grades × regions
-      let overall=-Infinity,bestReg='—',bestBy='—';
-      GRADES.forEach(g=>{
-        REGIONS.forEach(r=>{
-          const b=bestForGrade(c.id,g.key,r);
-          if(b.best>overall){overall=b.best;bestReg=r;bestBy=b.name;}
-        });
-      });
       const row=document.createElement('tr');
       const tdCut=document.createElement('td');tdCut.className='gpl-cut gpl-sticky';tdCut.textContent=c.cut;row.appendChild(tdCut);
-      // extra summary cols
-      [[fmtMoney(overall),'gpl-best'],[bestReg,'gpl-bestby'],[bestBy,'gpl-bestby']].forEach(([v,cls])=>{
-        const td=document.createElement('td');td.className=cls+' gpl-extra-col';td.textContent=overall>-Infinity?v:'—';row.appendChild(td);
-      });
-      // grade columns — best across all regions for this cut+grade
+      // grade columns — best price for this cut+grade across all regions, with country badge
       GRADES.forEach(g=>{
-        let gBest=-Infinity;
-        REGIONS.forEach(r=>{const b=bestForGrade(c.id,g.key,r);if(b.best>gBest)gBest=b.best;});
-        const td=document.createElement('td');
-        const isWin=gBest>-Infinity&&Math.abs(gBest-overall)<0.0001;
-        td.className='gpl-other'+(isWin?' winner':'');
-        td.textContent=gBest>-Infinity?fmtMoney(gBest):'—';
+        const {best,region}=bestAcrossRegions(c.id,g.key);
+        const td=document.createElement('td');td.className='gpl-grade-cell';
+        if(best>-Infinity){
+          const price=document.createElement('div');price.className='gpl-master-price';price.textContent=fmtMoney(best);
+          const badge=document.createElement('div');badge.className='gpl-best-badge';badge.textContent=region;
+          td.appendChild(price);td.appendChild(badge);
+        } else {
+          td.textContent='—';
+        }
         row.appendChild(td);
       });
       tbody.appendChild(row);
