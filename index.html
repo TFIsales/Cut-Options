@@ -911,13 +911,11 @@ function render(){
     addc.onclick=()=>{const n=prompt('New category name:');if(n&&!state.cats[n]){state.cats[n]=[];state.order.push(n);active=n;save();render();}};
     tabs.appendChild(addc);
   }
-  // global price list tab
-  // global price list tab — hidden for now
-  // const gplTab=document.createElement('button');
-  // gplTab.className='tab'+(globalPriceListActive?' gpl-tab':' gpl-inactive');
-  // gplTab.textContent='🌍 Global Price List';
-  // gplTab.onclick=async()=>{globalPriceListActive=true;render();await loadPriceList();await loadWeeklyHead();renderGlobalPriceList();};
-  // tabs.appendChild(gplTab);
+  const gplTab=document.createElement('button');
+  gplTab.className='tab'+(globalPriceListActive?' gpl-tab':' gpl-inactive');
+  gplTab.textContent='🌍 Global Price List';
+  gplTab.onclick=async()=>{globalPriceListActive=true;render();await loadPriceList();await loadWeeklyHead();renderGlobalPriceList();};
+  tabs.appendChild(gplTab);
   // search bar (always shown)
   const sbWrap=document.createElement('div');sbWrap.className='search-bar';
   const sbInp=document.createElement('input');
