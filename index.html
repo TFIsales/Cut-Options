@@ -658,6 +658,15 @@ const GRADES=[
   {key:'ag_grain_2p', label:'Angus Pure Grain',  short:'AP Grain',  marbling:'2+'},
   {key:'ag_grain_4p', label:'Angus Pure Grain',  short:'AP Grain',  marbling:'4+'},
 ];
+/* TRIM is priced on a different axis: program columns, not marbling grades */
+const TRIM_GRADES=[
+  {key:'gen',      label:'General',  short:'GEN'},
+  {key:'fa_grass', label:'FA Grass', short:'FA Grass'},
+  {key:'gf_angus', label:'GF Angus', short:'GF Angus'},
+  {key:'organic',  label:'Organic',  short:'Organic'}
+];
+const TRIM_ITEMS=['95 CL','90 CL','85 CL','80 CL','75 CL','70 CL','65 CL','50 CL','FAT','DMM'];
+function getTrimItems(){return TRIM_ITEMS.map(t=>({id:gplId('Trim',t),cut:t,category:'Trim'}));}
 function gpKey(cutId,gradeKey){return cutId+'__'+gradeKey;}
 /* best price for a specific cut+grade in a region across all salesmen */
 function bestForGrade(cutId,gradeKey,region){
@@ -1156,7 +1165,8 @@ function makeGradeTableScroller(){
   return {outer,tbl};
 }
 
-function buildGradeHead(tbl,extraCols){
+function buildGradeHead(tbl,extraCols,gradeSet){
+  gradeSet=gradeSet||GRADES;
   // single header row: Cut | extraCols | grade cols (each shows grade + marbling)
   const thead=document.createElement('thead');
   const row=document.createElement('tr');
@@ -1164,7 +1174,7 @@ function buildGradeHead(tbl,extraCols){
   extraCols.forEach(ec=>{
     const th=document.createElement('th');th.className='num gpl-extra-col';th.innerHTML=ec;row.appendChild(th);
   });
-  GRADES.forEach(g=>{
+  gradeSet.forEach(g=>{
     const th=document.createElement('th');th.className='num gpl-grade-th';
     th.innerHTML=`<span>${esc(g.short)}</span>${g.marbling?`<i>mb ${esc(g.marbling)}</i>`:''}`;
     th.title=g.label+(g.sub?' '+g.sub:'')+(g.marbling?' · mb '+g.marbling:'');
@@ -1177,23 +1187,26 @@ function buildGradeHead(tbl,extraCols){
 
 /* MASTER: one row per cut, columns = grades, cells = best across all regions */
 function renderMasterTable(wrap){
-  const cuts=getAllCuts();
+  masterGradeTable(wrap,getAllCuts(),GRADES);
+  masterGradeTable(wrap,getTrimItems(),TRIM_GRADES);
+}
+function masterGradeTable(wrap,cuts,gradeSet){
   const {outer,tbl}=makeGradeTableScroller();
-  buildGradeHead(tbl,[]);
+  buildGradeHead(tbl,[],gradeSet);
 
   const tbody=document.createElement('tbody');
   const byCat={};cuts.forEach(c=>{(byCat[c.category]=byCat[c.category]||[]).push(c);});
 
   Object.entries(byCat).forEach(([cat,catCuts])=>{
     const catRow=document.createElement('tr');catRow.className='gpl-cat-row';
-    const catTd=document.createElement('td');catTd.colSpan=1+GRADES.length;catTd.textContent=cat;
+    const catTd=document.createElement('td');catTd.colSpan=1+gradeSet.length;catTd.textContent=cat;
     catRow.appendChild(catTd);tbody.appendChild(catRow);
 
     catCuts.forEach(c=>{
       const row=document.createElement('tr');
       const tdCut=document.createElement('td');tdCut.className='gpl-cut gpl-sticky';tdCut.textContent=c.cut;row.appendChild(tdCut);
       // grade columns — best price for this cut+grade across all regions, with country badge
-      GRADES.forEach(g=>{
+      gradeSet.forEach(g=>{
         const {best,region}=bestAcrossRegions(c.id,g.key);
         const td=document.createElement('td');td.className='gpl-grade-cell';
         if(best>-Infinity){
@@ -1215,28 +1228,30 @@ function renderMasterTable(wrap){
 
 /* REGION: one row per cut, grade columns = your editable price + best-by badge */
 function renderRegionTable(wrap,region){
-  const cuts=getAllCuts();
+  regionGradeTable(wrap,region,getAllCuts(),GRADES);
+  regionGradeTable(wrap,region,getTrimItems(),TRIM_GRADES);
+}
+function regionGradeTable(wrap,region,cuts,gradeSet){
   const uid=currentUser?.id||'local';
   const myPrices=Object.assign({},((globalPrices[uid]||{}).prices||{})[region]||{});
-  const pending=Object.assign({},myPrices);
   let saveHandle=null;
 
   const {outer,tbl}=makeGradeTableScroller();
-  buildGradeHead(tbl,[]);
+  buildGradeHead(tbl,[],gradeSet);
 
   const tbody=document.createElement('tbody');
   const byCat={};cuts.forEach(c=>{(byCat[c.category]=byCat[c.category]||[]).push(c);});
 
   Object.entries(byCat).forEach(([cat,catCuts])=>{
     const catRow=document.createElement('tr');catRow.className='gpl-cat-row';
-    const catTd=document.createElement('td');catTd.colSpan=1+GRADES.length;catTd.textContent=cat;
+    const catTd=document.createElement('td');catTd.colSpan=1+gradeSet.length;catTd.textContent=cat;
     catRow.appendChild(catTd);tbody.appendChild(catRow);
 
     catCuts.forEach(c=>{
       const row=document.createElement('tr');
       const tdCut=document.createElement('td');tdCut.className='gpl-cut gpl-sticky';tdCut.textContent=c.cut;row.appendChild(tdCut);
 
-      GRADES.forEach(g=>{
+      gradeSet.forEach(g=>{
         const k=gpKey(c.id,g.key);
         const br=bestForGrade(c.id,g.key,region);
         const myRaw=myPrices[k];
@@ -1248,13 +1263,14 @@ function renderRegionTable(wrap,region){
         if(amIBest)inp.classList.add('gpl-winner-inp');
         inp.oninput=e=>{
           const v=parseFloat(e.target.value);
-          if(isNaN(v)||e.target.value.trim()==='')delete pending[k];
-          else pending[k]=state.displayCurrency==='USD'?v/(+state.fxRate||0.64):v;
-          clearTimeout(saveHandle);saveHandle=setTimeout(()=>{
-            const full=Object.assign({},(globalPrices[uid]||{}).prices||{});
-            full[region]=Object.assign({},pending);
-            saveMyPriceList(full);
-          },800);
+          // mutate the live shared store directly so the cuts table and trim
+          // table never overwrite each other's edits in the same region
+          if(!globalPrices[uid])globalPrices[uid]={name:String(currentUser?.email||uid).split('@')[0],prices:{}};
+          if(!globalPrices[uid].prices[region])globalPrices[uid].prices[region]={};
+          const reg=globalPrices[uid].prices[region];
+          if(isNaN(v)||e.target.value.trim()==='')delete reg[k];
+          else reg[k]=state.displayCurrency==='USD'?v/(+state.fxRate||0.64):v;
+          clearTimeout(saveHandle);saveHandle=setTimeout(()=>saveMyPriceList(globalPrices[uid].prices),800);
         };
         td.appendChild(inp);
         if(br.best>-Infinity){
