@@ -1043,12 +1043,17 @@ function optEl(blk,o,oi){
 
   const body=document.createElement('div');body.className='crows';
   const qlab=isKg?'kg':'yld %';
+  /* spell out what ⌖ will solve against, so the target is never a guess */
+  const beVs=oi===0
+    ?(blk.sel>0&&blk.options[blk.sel]?'“'+blk.options[blk.sel].name+'” (the route ticked USE)':'the best-value boned route')
+    :'“'+blk.options[0].name+'” (leaving the primal whole)';
+  const beTitle=esc('Break-even ⌖ — solve the $/kg ('+state.displayCurrency+') this cut needs for this route to exactly match '+beVs);
   o.rows.forEach(r=>{
     const row=document.createElement('div');row.className='crow';
     const qShown=isKg?r.q:+(r.q*100).toFixed(4);
     row.innerHTML=`<input class="cutname" value="${esc(r.cut)}" ${ro}>
       <div class="cflds">
-        <label class="fld"><i>${state.displayCurrency==='USD'?'$/kg USD':'$/kg AUD'}</i><span class="pwrap"><input class="n sm" type="number" step="0.01" value="${state.displayCurrency==='USD'?(r.price*(+state.fxRate||0.64)).toFixed(2):r.price}" data-f="price"><button class="be" title="Break-even ⌖ — solve the $/kg (${state.displayCurrency}) this cut needs for boning to match leaving the primal whole">⌖</button></span></label>
+        <label class="fld"><i>${state.displayCurrency==='USD'?'$/kg USD':'$/kg AUD'}</i><span class="pwrap"><input class="n sm" type="number" step="0.01" value="${state.displayCurrency==='USD'?(r.price*(+state.fxRate||0.64)).toFixed(2):r.price}" data-f="price"><button class="be" title="${beTitle}">⌖</button></span></label>
         <label class="fld"><i>${qlab}</i><input class="n sm" type="number" step="0.001" value="${qShown}" data-f="q" ${ro}></label>
         <label class="fld"><i>labour $/hd</i><input class="n sm" type="number" step="0.01" value="${state.displayCurrency==='USD'?(r.labour*(+state.fxRate||0.64)).toFixed(2):r.labour}" data-f="labour"></label>
         <span class="fld out"><i>est. kg</i><span class="rv" data-rowwt="${r.id}">–</span></span>
@@ -1329,7 +1334,13 @@ function renderWeeklyHeadSection(wrap){
 function solveBE(blk,oi,row,inp){
   const isKg=blk.mode==='kg';const o=blk.options[oi];
   let T;
-  if(oi===0){let best=-Infinity;blk.options.forEach((x,k)=>{if(k!==0)best=Math.max(best,optNet(blk,x))});T=(best===-Infinity?0:best);}
+  /* reference side: solve against whichever route is picked with "use", so the
+     radio drives the comparison in both directions. If "use" is still on the
+     reference itself there is no chosen route, so fall back to the best one. */
+  if(oi===0){
+    if(blk.sel>0&&blk.options[blk.sel])T=optNet(blk,blk.options[blk.sel]);
+    else{let best=-Infinity;blk.options.forEach((x,k)=>{if(k!==0)best=Math.max(best,optNet(blk,x))});T=(best===-Infinity?0:best);}
+  }
   else T=optNet(blk,blk.options[0]);
   let other=0;
   o.rows.forEach(r=>{if(r!==row)other+=rowVal(blk,r)-labourVal(blk,r);});
